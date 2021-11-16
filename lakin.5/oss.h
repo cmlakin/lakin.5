@@ -1,5 +1,5 @@
 #pragma once
-#include "shm.h"
+//#include "shm.h"
 
 const unsigned long maxTimeBetweenNewProcsNS = 100;
 const int maxTimeBetweenNewProcsSecs = 1;
@@ -17,24 +17,20 @@ int g_bitVector = 0;
 char logbuf[200];
 pid_t pid;
 
-void processCommandLine(int, char **);
 void initialize();
 void initializeSharedMemory();
 void initializeMessageQueue();
 struct proc_ctrl_blck  * createProcess();
-void dispatch();
+void requestResponse();
 void createMessageQueue();
 void launchNewProc();
 void ossClock();
-void addToQueue(struct proc_ctrl_blck  *);
-void dispatchUpdateClock();
 void updateClock(int, int);
 void logStatistics(const char *);
 void deinitSharedMemory();
 void setBit(int);
 bool bitIsSet(int);
 void clearBit(int);
-void timeSlice();
 void bail();
 void sigHandler(const int);
 int initializeSig();

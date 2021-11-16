@@ -16,11 +16,6 @@ static int id = -1;
 shared_data *  shmAttach();
 void shmDetach();
 
-// 	((struct shared_data *) shm_data)->ptab.pcb[pcbIndex].id = pcbIndex * 1000
-//			+ shm_data->local_pid++;
-// shared_data * shmGetData();
-// proc_table * shmGetProcTable();
-
 int shmGet() {
     int flags = 0;
 
@@ -77,12 +72,3 @@ void shmDetach() {
 
 }
 
-// 	((struct shared_data *) shm_data)->ptab.pcb[pcbIndex].id = pcbIndex * 1000
-//			+ shm_data->local_pid++;
-// shared_data * getSharedData() {
-//
-// }
-// proc_table * getProcTable();
-// PCB * getPCB(id);
-//
-// static int shm_id = -1;
