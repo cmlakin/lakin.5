@@ -7,6 +7,14 @@
 #include "shm.h"
 #include "config.h"
 
+/*** 
+	-process structures
+	-request
+	-resources
+
+***/
+
+
 static char xperror_buf[50]; // buffer for perror
 static const char * xperror_arg0 = "oss"; // pointer to return error value
 

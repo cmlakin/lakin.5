@@ -5,6 +5,11 @@
 #include "osclock.h"
 #include "shm.h"
 
+/***
+	update constantly
+
+***/
+
 static shared_data * data;
 
 void set(int seconds, int nanoseconds) {

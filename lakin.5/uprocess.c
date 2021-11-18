@@ -1,20 +1,6 @@
 #include "config.h"
 #include "shm.h"
 
-/***
-	-request resource 
-		-when first created then at random times
-	-set bound when to request/release resources
-		-generate random number to do this
-	-generate request by putting it in shared memory
-		-continue to loop and see if resource was granted
-		-can't ask for more than MAX
-			(request + allocation) <= MAX
-	-check to terminate 0-250 milliseconds
-		-must run for at least one second before terminating
-			-if yes, release all resources
-			-if no, request or release
-***/
 
 char perror_buf[50];
 const char * perror_arg0 = "uprocess";

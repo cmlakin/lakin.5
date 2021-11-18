@@ -17,21 +17,6 @@
 #include "shm.h"
 #include "oss.h"
 
-/***
-	- allocate shm for data structures
-		-create 20 resources with descriptors
-			-16 static
-			-4 shared (no deadlock detection necessary)
-			-initialize with value 1-10
-	-18 max processes at one time
-	-run deadlock avoidance algorithm before granting resources
-		-if yes, update all data structures when resources granted or released
-		-if no, put in waiting queue and go to sleep until awakened
-	-update clock as necessary
-	-fork children at random times (1-500 milliseconds of logical clock)
-
-***/
-
 int main(int argc, char ** argv){
 
     unlink(LOG_FILENAME);
