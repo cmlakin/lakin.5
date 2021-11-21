@@ -1,17 +1,24 @@
+#pragma once
 #include "osclock.h"
 
 
-struct state {
+//struct state {
+//
+//	int resource[];
+//	int available[];
+//	int claim[][];
+//	int alloc[][];
+//
+//};
 
-	int resource[];
-	int available[];
-	int claim[][];
-	int alloc[][];
-
+struct proc_ctrl_blck {
+	int pid;
+	int local_pid;
+	int rsrcsNeeded[19]; // fill randomly
 } PCB;
 
 typedef struct proc_table {
-	struct state[17];
+	struct proc_ctrl_blck pcb[17];
 } proc_table;
 
 // shared memory

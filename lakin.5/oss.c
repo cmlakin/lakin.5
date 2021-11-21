@@ -16,6 +16,7 @@
 #include "osclock.h"
 #include "shm.h"
 #include "oss.h"
+#include "queue.h"
 
 /***
 	- allocate shm for data structures
@@ -28,9 +29,11 @@
 		-if yes, update all data structures when resources granted or released
 		-if no, put in waiting queue and go to sleep until awakened
 	-update clock as necessary
-	-fork children at random times (1-500 milliseconds of logical clock)
+	-fork children at random times (1-500 milliseconds of loggerical clock)
 
 ***/
+static int resources[19];
+static int MAX = 10; // maximum number of resources
 
 int main(int argc, char ** argv){
 
@@ -99,7 +102,6 @@ void requestResponse(PCB *pcb) {
     
 		memset((void *)&send, 0, sizeof(send));
     send.mtype = (pcb->local_pid & 0xff) + 1;
-    send.pRunNano = shm_data->osRunNano;
     send.ossid = send.mtype;
     strcpy(send.mtext, "foo");
 
@@ -151,11 +153,11 @@ PCB * createProcess() {
         snprintf(strbuf, sizeof(strbuf), "%d", pcb->local_pid & 0xff);
 
         osclock.add(0,1);
-        snprintf(logbuf, sizeof(logbuf),
+        snprintf(loggerbuf, sizeof(logbuf),
             "OSS: Generating process with PID %i and putting it in queue %i at time %0d:%09d\n",
             pcb->local_pid & 0xff, pcb->ptype, osclock.seconds(), osclock.nanoseconds());
 
-        logStatistics(logbuf);
+        logger(logbuf);
 
         shm_data->local_pid++;
 
@@ -175,6 +177,20 @@ PCB * createProcess() {
 void initialize() {
     initializeSharedMemory();
     initializeMessageQueue();
+
+		int i;
+		for (i = 0; i < 19; i++) {
+			resources[i] = rand() % MAX + 1;
+		}
+
+
+		for (i = 0; i < 19; i++) {
+				printf("R%i ", i);
+		}
+		printf("\n");
+		for (i = 0; i < 19; i++) {
+			printf("%02d ", i);
+		}
 }
 
 void initializeSharedMemory() {
@@ -281,7 +297,7 @@ void updateClock(int sec, int nano) {
     //printf("updateClock: %i:%i\n", osclock.seconds(), osclock.nanoseconds());
 }
 
-void log(const char * string_buf) {
+void logger(const char * string_buf) {
     int fid;
     fid = open(LOG_FILENAME, O_RDWR | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
 

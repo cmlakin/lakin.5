@@ -26,7 +26,7 @@ void createMessageQueue();
 void launchNewProc();
 void ossClock();
 void updateClock(int, int);
-void log(const char *);
+void logger(const char *);
 void deinitSharedMemory();
 void setBit(int);
 bool bitIsSet(int);

@@ -8,8 +8,8 @@ all: oss user_proc
 clean:
 	rm *.o oss user_proc 
 
-oss: oss.o osclock.o shm.o
-	$(GCC) $(CFLAGS) oss.o osclock.o shm.o -o oss
+oss: oss.o queue.o osclock.o shm.o
+	$(GCC) $(CFLAGS) oss.o queue.o osclock.o shm.o -o oss
 
 oss.o: oss.c oss.h config.h osclock.h
 	$(GCC) $(CFLAGS) -c oss.c
@@ -26,3 +26,5 @@ osclock.o: osclock.c osclock.h shm.h
 shm.o: shm.c shm.h
 	$(GCC)  $(CFLAGS) -c shm.c
 
+queue.o: queue.c queue.h
+	$(GCC) $(CFLAGS) -c queue.c
