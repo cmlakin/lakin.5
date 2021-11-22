@@ -121,8 +121,8 @@ void enqueueBlocking(PCB * pcb, int ossec, int ossnano) {
     //
     // save these in pcb for testing
     //
-    pcb->testsec = new->dqtime.sec;
-    pcb->testnano = new->dqtime.nano;
+    // pcb->testsec = new->dqtime.sec;
+    // pcb->testnano = new->dqtime.nano;
 
     if(queues.blocking.head  == NULL) {
         queues.blocking.head  = new;

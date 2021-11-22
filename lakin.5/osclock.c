@@ -46,7 +46,7 @@ void init() {
     if(data == NULL) {
         printf("could not get shared data\n");
     } else {
-        printf("clock got shared data\n");
+        printf("\nclock got shared data\n");
     }
     osclock.set = set;
     osclock.add = add;

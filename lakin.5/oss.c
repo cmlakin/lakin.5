@@ -33,7 +33,7 @@
 
 ***/
 static int resources[19];
-static int MAX = 10; // maximum number of resources
+static int MAX; // maximum number of resources
 
 int main(int argc, char ** argv){
 
@@ -61,18 +61,18 @@ void scheduler() {
 
     foo = createProcess();
 
-    while(totalProcesses < 50) {
-        
-        if (activeProcs < 18) {
+    while(totalProcesses < 2) {
+
+        if (activeProcs < 2) {
             int create = osclock.seconds() > shm_data->launchSec;
 
             if(!create && osclock.seconds()) {
-                create = osclock.seconds() > shm_data->launchSec 
+                create = osclock.seconds() > shm_data->launchSec
 								&& osclock.nanoseconds() >= shm_data->launchNano;
             }
             if(create) {
-                printf("current %0d:%09d\n", osclock.seconds(), osclock.nanoseconds());
-                printf("lanuch  %0d:%09d\n", shm_data->launchSec, shm_data->launchNano);
+                // printf("current %0d:%09d\n", osclock.seconds(), osclock.nanoseconds());
+                // printf("lanuch  %0d:%09d\n", shm_data->launchSec, shm_data->launchNano);
                 foo = createProcess();
                 launchNewProc();
             }
@@ -80,7 +80,7 @@ void scheduler() {
         osclock.add(0,1000000);
         //sleep(1);
     }
-    printf("total processes = 40\n");
+    //printf("total processes = 40\n");
     bail();
 }
 
@@ -99,15 +99,12 @@ void requestResponse(PCB *pcb) {
     }
 
     printf("oss msg received: %s\n", recv.mtext);
-    
+
 		memset((void *)&send, 0, sizeof(send));
     send.mtype = (pcb->local_pid & 0xff) + 1;
     send.ossid = send.mtype;
     strcpy(send.mtext, "foo");
 
-
-    pcb->startsec = osclock.seconds();
-    pcb->startnano = osclock.nanoseconds();
     while (msgsnd(msg_id, (void *)&send, sizeof(send), 0) == -1) {
         printf("oss: msg not sent to %d error %d\n", (int)send.mtype, errno);
         sleep(1);
@@ -152,12 +149,27 @@ PCB * createProcess() {
         printf("oss: local_pid %d\n",  pcb->local_pid & 0xff);
         snprintf(strbuf, sizeof(strbuf), "%d", pcb->local_pid & 0xff);
 
-        osclock.add(0,1);
-        snprintf(loggerbuf, sizeof(logbuf),
-            "OSS: Generating process with PID %i and putting it in queue %i at time %0d:%09d\n",
-            pcb->local_pid & 0xff, pcb->ptype, osclock.seconds(), osclock.nanoseconds());
+        int i;
+        for ( i = 0; i < 20; i++) {
+          MAX = resources[i];
+          pcb->rsrcsNeeded[i] = rand() % MAX;
+        }
 
-        logger(logbuf);
+        for (i = 0; i < 20; i++) {
+            printf("RN%i ", i);
+        }
+        printf("\n");
+        for (i = 0; i < 20; i++) {
+             printf("  %02d ", pcb->rsrcsNeeded[i]);
+        }
+
+
+        osclock.add(0,1);
+        // snprintf(logbuf, sizeof(logbuf),
+        //     "OSS: Generating process with PID %i and putting it in queue %i at time %0d:%09d\n",
+        //     pcb->local_pid & 0xff, pcb->ptype, osclock.seconds(), osclock.nanoseconds());
+
+        //logger(logbuf);
 
         shm_data->local_pid++;
 
@@ -179,17 +191,17 @@ void initialize() {
     initializeMessageQueue();
 
 		int i;
-		for (i = 0; i < 19; i++) {
+		for (i = 0; i < 20; i++) {
 			resources[i] = rand() % MAX + 1;
 		}
 
 
-		for (i = 0; i < 19; i++) {
-				printf("R%i ", i);
+		for (i = 0; i < 20; i++) {
+				printf("R%02d ", i);
 		}
 		printf("\n");
-		for (i = 0; i < 19; i++) {
-			printf("%02d ", i);
+		for (i = 0; i < 20; i++) {
+			   printf(" %02d ", resources[i]);
 		}
 }
 
@@ -383,4 +395,3 @@ int initializeSig() {
     alarm(ALARM_TIME);
     return 0;
 }
-

@@ -2,7 +2,7 @@
 #include "osclock.h"
 
 
-//struct state {
+//typedef struct state {
 //
 //	int resource[];
 //	int available[];
@@ -11,7 +11,7 @@
 //
 //};
 
-struct proc_ctrl_blck {
+typedef struct proc_ctrl_blck {
 	int pid;
 	int local_pid;
 	int rsrcsNeeded[19]; // fill randomly
@@ -41,4 +41,3 @@ typedef struct shared_data {
 int shmGet();
 shared_data * shmAttach();
 void shmDetach();
-
