@@ -2,7 +2,7 @@
 #include "shm.h"
 
 /***
-	-request resource 
+	-request resource
 		-when first created then at random times
 	-set bound when to request/release resources
 		-generate random number to do this
@@ -32,6 +32,7 @@ char strbuf[20];
 
 
 int main (int argc, char ** argv){
+    printf("In user_proc\n");
     int id = atoi(argv[1]);
 
     foo = id;

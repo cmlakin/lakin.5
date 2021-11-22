@@ -62,6 +62,9 @@ enum queue_priority {
 
 static int totalProcesses = 0;
 static struct shared_data * shm_data = NULL;
+static struct state * rState = NULL;
+//static int resources[19];
+static int MAX = 10; // maximum number of resources
 
 // message buffer
 typedef struct ipcmsg {

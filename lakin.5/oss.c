@@ -32,8 +32,7 @@
 	-fork children at random times (1-500 milliseconds of loggerical clock)
 
 ***/
-static int resources[19];
-static int MAX = 10; // maximum number of resources
+
 
 int main(int argc, char ** argv){
 
@@ -47,12 +46,13 @@ int main(int argc, char ** argv){
         osclock.add(shm_data->launchSec, shm_data->launchNano);
     }
 
-
-    scheduler();
+    while (totalProcesses < 2) {
+      scheduler();
+    }
 
     deinitSharedMemory();
     printf("oss done\n");
-    bail();
+    //bail();
 }
 
 /** maybe reuse **/
@@ -61,65 +61,65 @@ void scheduler() {
 
     foo = createProcess();
 
-    while(totalProcesses < 2) {
-
-        if (activeProcs < 2) {
-            int create = osclock.seconds() > shm_data->launchSec;
-
-            if(!create && osclock.seconds()) {
-                create = osclock.seconds() > shm_data->launchSec
-								&& osclock.nanoseconds() >= shm_data->launchNano;
-            }
-            if(create) {
-                // printf("current %0d:%09d\n", osclock.seconds(), osclock.nanoseconds());
-                // printf("lanuch  %0d:%09d\n", shm_data->launchSec, shm_data->launchNano);
-                foo = createProcess();
-                launchNewProc();
-            }
-        }
-        osclock.add(0,1000000);
-        //sleep(1);
-    }
+    // while(totalProcesses < 2) {
+    //
+    //     if (activeProcs < 2) {
+    //         int create = osclock.seconds() > shm_data->launchSec;
+    //
+    //         if(!create && osclock.seconds()) {
+    //             create = osclock.seconds() > shm_data->launchSec
+		// 						&& osclock.nanoseconds() >= shm_data->launchNano;
+    //         }
+    //         if(create) {
+    //             // printf("current %0d:%09d\n", osclock.seconds(), osclock.nanoseconds());
+    //             // printf("lanuch  %0d:%09d\n", shm_data->launchSec, shm_data->launchNano);
+    //             foo = createProcess();
+    //             launchNewProc();
+    //         }
+    //     }
+    //     osclock.add(0,1000000);
+    //     //sleep(1);
+    // }
     //printf("total processes = 40\n");
-    bail();
+    //bail();
 }
 
 /** alter to fit current project **/
-void requestResponse(PCB *pcb) {
-    printf("oss: dispatch %d\n", pcb->local_pid & 0xff);
-
-    // create msg to send to uproc
-    struct ipcmsg send;
-    struct ipcmsg recv;
-
-    printf("oss: waiting for msg\n");
-
-    while(msgrcv(msg_id, (void *)&recv, sizeof(recv), send.ossid, 0) == -1) {
-        printf("oss: waiting for msg error %d\n", errno);
-    }
-
-    printf("oss msg received: %s\n", recv.mtext);
-
-		memset((void *)&send, 0, sizeof(send));
-    send.mtype = (pcb->local_pid & 0xff) + 1;
-    send.ossid = send.mtype;
-    strcpy(send.mtext, "foo");
-
-    while (msgsnd(msg_id, (void *)&send, sizeof(send), 0) == -1) {
-        printf("oss: msg not sent to %d error %d\n", (int)send.mtype, errno);
-        sleep(1);
-    }
-
-    printf("oss: msg sent to %d\n", (int)send.mtype);
-    printf("msg_id %i\n", msg_id);
-
-}
+// void requestResponse(PCB *pcb) {
+//     printf("oss: dispatch %d\n", pcb->local_pid & 0xff);
+//
+//     // create msg to send to uproc
+//     struct ipcmsg send;
+//     struct ipcmsg recv;
+//
+//     printf("oss: waiting for msg\n");
+//
+//     while(msgrcv(msg_id, (void *)&recv, sizeof(recv), send.ossid, 0) == -1) {
+//         printf("oss: waiting for msg error %d\n", errno);
+//     }
+//
+//     printf("oss msg received: %s\n", recv.mtext);
+//
+// 		memset((void *)&send, 0, sizeof(send));
+//     send.mtype = (pcb->local_pid & 0xff) + 1;
+//     send.ossid = send.mtype;
+//     strcpy(send.mtext, "foo");
+//
+//     while (msgsnd(msg_id, (void *)&send, sizeof(send), 0) == -1) {
+//         printf("oss: msg not sent to %d error %d\n", (int)send.mtype, errno);
+//         sleep(1);
+//     }
+//
+//     printf("oss: msg sent to %d\n", (int)send.mtype);
+//     printf("msg_id %i\n", msg_id);
+//
+// }
 
 /*** change to fit new project ***/
 
 PCB * createProcess() {
     printf("createProcess\n");
-    activeProcs++;
+    // activeProcs++;
     totalProcesses++;
 
     PCB *pcb;
@@ -147,28 +147,19 @@ PCB * createProcess() {
         pcb->local_pid = shm_data->local_pid << 8 | pcbIndex;
 
         printf("oss: local_pid %d\n",  pcb->local_pid & 0xff);
-        snprintf(strbuf, sizeof(strbuf), "%d", pcb->local_pid & 0xff);
+        //snprintf(strbuf, sizeof(strbuf), "%d", pcb->local_pid & 0xff);
+        printf("before for loop\n");
 
         int i;
         int max = 0;
-        printf("before for loop\n");
-        for ( i = 0; i < 20; i++) {
-          max = resources[i];
-          printf("max = %i ", max);
-          // pcb->rsrcsNeeded[i] = rand() % MAX;
-          // printf("RN = %i ", pcb->rsrcsNeeded[i]);
+        for (i = 0; i < 20; i++) {
+             //printf(" %02d ", resources[i]);
+             max = rState->resource[i] + 1;
+             //printf("max = %d ", max);
+             pcb->rsrcsNeeded[i] = rand() % max;
+             printf("RN[%02d] = %d\n", i, pcb->rsrcsNeeded[i]);
         }
         printf("after for loop\n");
-
-
-        // for (i = 0; i < 20; i++) {
-        //     printf("RN%i ", i);
-        // }
-        // printf("\n");
-        // for (i = 0; i < 20; i++) {
-        //      printf("  %02d ", pcb->rsrcsNeeded[i]);
-        // }
-
 
         osclock.add(0,1);
         // snprintf(logbuf, sizeof(logbuf),
@@ -198,16 +189,15 @@ void initialize() {
 
 		int i;
 		for (i = 0; i < 20; i++) {
-			resources[i] = rand() % MAX + 1;
+			rState->resource[i] = rand() % MAX + 1;
 		}
-
 
 		for (i = 0; i < 20; i++) {
 				printf("R%02d ", i);
 		}
 		printf("\n");
 		for (i = 0; i < 20; i++) {
-			   printf(" %02d ", resources[i]);
+			   printf(" %02d ", rState->resource[i]);
 		}
 }
 
@@ -350,54 +340,54 @@ void clearBit(int b) {
     g_bitVector &= ~(1 << b);
 }
 
-void doSigHandler(int sig) {
-    if (sig == SIGTERM) {
-        // kill child process - reconfig to work with current code
-        kill(getpid(), SIGKILL); // resend to child
-    }
-}
-
-void bail() {
-    kill(0, SIGTERM);
-    deinitSharedMemory();
-    exit(0);
-}
-
-
-void sigHandler(const int sig) {
-    sigset_t mask, oldmask;
-    sigfillset(&mask);
-
-    // block all signals
-    sigprocmask(SIG_SETMASK, &mask, &oldmask);
-
-    if (sig == SIGINT) {
-        printf("oss[%d]: Ctrl-C received\n", getpid());
-        bail();
-    }
-    else if (sig == SIGALRM) {
-        printf("oss[%d]: Alarm raised\n", getpid());
-        bail();
-    }
-    sigprocmask(SIG_SETMASK, &oldmask, NULL);
-}
-
-int initializeSig() {
-    struct sigaction sa;
-    sa.sa_flags = 0;
-    sigemptyset(&sa.sa_mask); // ignore next signals
-
-    if(sigaction(SIGTERM, &sa, NULL) == -1) {
-        perror("sigaction");
-        return -1;
-    }
-
-    // alarm and Ctrl-C(SIGINT) have to be handled
-    sa.sa_handler = sigHandler;
-    if ((sigaction(SIGALRM, &sa, NULL) == -1) ||    (sigaction(SIGINT, &sa, NULL) == -1)) {
-        perror("sigaction");
-        return -1;
-    }
-    alarm(ALARM_TIME);
-    return 0;
-}
+// void doSigHandler(int sig) {
+//     if (sig == SIGTERM) {
+//         // kill child process - reconfig to work with current code
+//         kill(getpid(), SIGKILL); // resend to child
+//     }
+// }
+//
+// void bail() {
+//     kill(0, SIGTERM);
+//     deinitSharedMemory();
+//     exit(0);
+// }
+//
+//
+// void sigHandler(const int sig) {
+//     sigset_t mask, oldmask;
+//     sigfillset(&mask);
+//
+//     // block all signals
+//     sigprocmask(SIG_SETMASK, &mask, &oldmask);
+//
+//     if (sig == SIGINT) {
+//         printf("oss[%d]: Ctrl-C received\n", getpid());
+//         bail();
+//     }
+//     else if (sig == SIGALRM) {
+//         printf("oss[%d]: Alarm raised\n", getpid());
+//         bail();
+//     }
+//     sigprocmask(SIG_SETMASK, &oldmask, NULL);
+// }
+//
+// int initializeSig() {
+//     struct sigaction sa;
+//     sa.sa_flags = 0;
+//     sigemptyset(&sa.sa_mask); // ignore next signals
+//
+//     if(sigaction(SIGTERM, &sa, NULL) == -1) {
+//         perror("sigaction");
+//         return -1;
+//     }
+//
+//     // alarm and Ctrl-C(SIGINT) have to be handled
+//     sa.sa_handler = sigHandler;
+//     if ((sigaction(SIGALRM, &sa, NULL) == -1) ||    (sigaction(SIGINT, &sa, NULL) == -1)) {
+//         perror("sigaction");
+//         return -1;
+//     }
+//     alarm(ALARM_TIME);
+//     return 0;
+// }
