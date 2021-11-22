@@ -33,7 +33,7 @@
 
 ***/
 static int resources[19];
-static int MAX; // maximum number of resources
+static int MAX = 10; // maximum number of resources
 
 int main(int argc, char ** argv){
 
@@ -150,18 +150,23 @@ PCB * createProcess() {
         snprintf(strbuf, sizeof(strbuf), "%d", pcb->local_pid & 0xff);
 
         int i;
+        int max = 0;
+        printf("before for loop\n");
         for ( i = 0; i < 20; i++) {
-          MAX = resources[i];
-          pcb->rsrcsNeeded[i] = rand() % MAX;
+          max = resources[i];
+          printf("max = %i ", max);
+          // pcb->rsrcsNeeded[i] = rand() % MAX;
+          // printf("RN = %i ", pcb->rsrcsNeeded[i]);
         }
+        printf("after for loop\n");
 
-        for (i = 0; i < 20; i++) {
-            printf("RN%i ", i);
-        }
-        printf("\n");
-        for (i = 0; i < 20; i++) {
-             printf("  %02d ", pcb->rsrcsNeeded[i]);
-        }
+        // for (i = 0; i < 20; i++) {
+        //     printf("RN%i ", i);
+        // }
+        // printf("\n");
+        // for (i = 0; i < 20; i++) {
+        //      printf("  %02d ", pcb->rsrcsNeeded[i]);
+        // }
 
 
         osclock.add(0,1);
