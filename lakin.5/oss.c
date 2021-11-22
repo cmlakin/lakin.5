@@ -160,6 +160,7 @@ PCB * createProcess() {
         }
         printf("after for loop\n");
 
+
         // for (i = 0; i < 20; i++) {
         //     printf("RN%i ", i);
         // }
