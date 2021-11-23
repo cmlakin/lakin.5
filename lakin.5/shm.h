@@ -29,12 +29,12 @@ typedef struct shared_data {
 	int launchSec;
 	int launchNano;
 	// simulated clock
-   osclock_t osclock;
+  osclock_t osclock;
 
 	// process table
 	struct proc_table ptab;
 
-	//struct state r_state;
+	struct state r_state;
 
 	// report stats
 

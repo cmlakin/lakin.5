@@ -46,7 +46,7 @@ int main(int argc, char ** argv){
         osclock.add(shm_data->launchSec, shm_data->launchNano);
     }
 
-    while (totalProcesses < 1) {
+    while (totalProcesses < 2) {
       scheduler();
     }
 
@@ -156,18 +156,19 @@ PCB * createProcess() {
     		}
     		printf("\n");
     		for (i = 0; i < 20; i++) {
-    			   printf(" %02d ", r_state->resource[i]);
+    			   printf(" %02d ", shm_data->r_state.resource[i]);
     		}
-        // int i;
-        // int max = 0;
-        // for (i = 0; i < 20; i++) {
-        //      printf(" %02d ", r_state->resource[i]);
-        //      max = r_state->resource[i] + 1;
-        //      printf("max = %d ", max);
-        //      pcb->rsrcsNeeded[i] = rand() % max;
-        //      printf("RN[%02d] = %d\n", i, pcb->rsrcsNeeded[i]);
-        // }
-        // printf("after for loop\n");
+        //int i;
+        int max = 0;
+        printf("\n");
+        for (i = 0; i < 20; i++) {
+             printf(" %02d ", shm_data->r_state.resource[i]);
+             max = shm_data->r_state.resource[i] + 1;
+             printf("max = %02d ", max);
+             pcb->rsrcsNeeded[i] = rand() % max;
+             printf("RN[%02d] = %02d\n", i, pcb->rsrcsNeeded[i]);
+        }
+        printf("after for loop\n");
 
         // osclock.add(0,1);
         // // snprintf(logbuf, sizeof(logbuf),
@@ -188,25 +189,30 @@ PCB * createProcess() {
     return pcb;
 }
 
+state * initializeResources() {
+    //state * r_state;
+
+    printf("\nin initialize\n");
+    int i;
+    for (i = 0; i < 20; i++) {
+      shm_data->r_state.resource[i] = rand() % MAX + 1;
+    }
+
+    for (i = 0; i < 20; i++) {
+        printf("R%02d ", i);
+    }
+    printf("\n");
+    for (i = 0; i < 20; i++) {
+         printf(" %02d ", shm_data->r_state.resource[i]);
+    }
+}
 
 /********** keep ************/
-/** initialize is working **/
+
 void initialize() {
     initializeSharedMemory();
     initializeMessageQueue();
-    printf("\nin initialize\n");
-		int i;
-		for (i = 0; i < 20; i++) {
-			r_state->resource[i] = rand() % MAX + 1;
-		}
-
-		for (i = 0; i < 20; i++) {
-				printf("R%02d ", i);
-		}
-		printf("\n");
-		for (i = 0; i < 20; i++) {
-			   printf(" %02d ", r_state->resource[i]);
-		}
+    initializeResources();
 }
  /** initializeSharedMemory is working **/
 void initializeSharedMemory() {
@@ -249,18 +255,6 @@ void initializeSharedMemory() {
         memset((void *)shm_data, 0, sizeof(struct shared_data));
     }
     shm_data->local_pid = 1;
-
-    // attach the region to memory
-    r_state = (struct state*)shmat(shm_id, NULL, 0);
-
-    // if attach failed
-    if (r_state== (void*)-1) {
-        snprintf(perror_buf, sizeof(perror_buf), "%s: shmat: ", perror_arg0);
-        perror(perror_buf);
-        //return -1;
-    } else {
-        memset((void *)r_state, 0, sizeof(struct state));
-    }
 }
 
 void initializeMessageQueue() {
