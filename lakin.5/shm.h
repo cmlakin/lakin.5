@@ -2,14 +2,14 @@
 #include "osclock.h"
 
 
-//typedef struct state {
-//
-//	int resource[];
-//	int available[];
-//	int claim[][];
-//	int alloc[][];
-//
-//};
+typedef struct state {
+
+	int resource[19];
+	int available[19];
+	int claim[17][19];
+	int alloc[17][19];
+
+} state;
 
 typedef struct proc_ctrl_blck {
 	int pid;
@@ -29,10 +29,12 @@ typedef struct shared_data {
 	int launchSec;
 	int launchNano;
 	// simulated clock
-   osclock_t osclock;
+  osclock_t osclock;
 
 	// process table
 	struct proc_table ptab;
+
+	struct state r_state;
 
 	// report stats
 

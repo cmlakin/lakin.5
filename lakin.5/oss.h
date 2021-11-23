@@ -21,6 +21,7 @@ void initialize();
 void initializeSharedMemory();
 void initializeMessageQueue();
 struct proc_ctrl_blck  * createProcess();
+struct state * initializeResources();
 void requestResponse();
 void createMessageQueue();
 void launchNewProc();
