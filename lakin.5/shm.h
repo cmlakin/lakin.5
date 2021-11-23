@@ -34,6 +34,8 @@ typedef struct shared_data {
 	// process table
 	struct proc_table ptab;
 
+	//struct state r_state;
+
 	// report stats
 
 } shared_data;

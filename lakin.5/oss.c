@@ -46,13 +46,14 @@ int main(int argc, char ** argv){
         osclock.add(shm_data->launchSec, shm_data->launchNano);
     }
 
-    while (totalProcesses < 2) {
+    while (totalProcesses < 1) {
       scheduler();
     }
 
     deinitSharedMemory();
-    printf("oss done\n");
+    printf("\noss done\n");
     //bail();
+    return 0;
 }
 
 /** maybe reuse **/
@@ -118,7 +119,7 @@ void scheduler() {
 /*** change to fit new project ***/
 
 PCB * createProcess() {
-    printf("createProcess\n");
+    printf("\ncreateProcess\n");
     // activeProcs++;
     totalProcesses++;
 
@@ -130,7 +131,7 @@ PCB * createProcess() {
         printf("oss: createProcess: no free pcbs\n");
         return NULL;
     }
-    printf("oss: createProcess: available pcb %d\n", pcbIndex);
+    //printf("oss: createProcess: available pcb %d\n", pcbIndex);
     setBit(pcbIndex);
     allocatedProcs++;
 
@@ -142,36 +143,43 @@ PCB * createProcess() {
         perror("Failed to create new process\n");
         return NULL;
     } else if (pid == 0) {
-        char strbuf[16];
+        //char strbuf[16];
 
         pcb->local_pid = shm_data->local_pid << 8 | pcbIndex;
 
-        printf("oss: local_pid %d\n",  pcb->local_pid & 0xff);
+        //printf("oss: local_pid %d\n",  pcb->local_pid & 0xff);
         //snprintf(strbuf, sizeof(strbuf), "%d", pcb->local_pid & 0xff);
-        printf("before for loop\n");
-
+        printf("\nin create process\n");
         int i;
-        int max = 0;
         for (i = 0; i < 20; i++) {
-             //printf(" %02d ", resources[i]);
-             max = rState->resource[i] + 1;
-             //printf("max = %d ", max);
-             pcb->rsrcsNeeded[i] = rand() % max;
-             printf("RN[%02d] = %d\n", i, pcb->rsrcsNeeded[i]);
-        }
-        printf("after for loop\n");
+    				printf("R%02d ", i);
+    		}
+    		printf("\n");
+    		for (i = 0; i < 20; i++) {
+    			   printf(" %02d ", r_state->resource[i]);
+    		}
+        // int i;
+        // int max = 0;
+        // for (i = 0; i < 20; i++) {
+        //      printf(" %02d ", r_state->resource[i]);
+        //      max = r_state->resource[i] + 1;
+        //      printf("max = %d ", max);
+        //      pcb->rsrcsNeeded[i] = rand() % max;
+        //      printf("RN[%02d] = %d\n", i, pcb->rsrcsNeeded[i]);
+        // }
+        // printf("after for loop\n");
 
-        osclock.add(0,1);
-        // snprintf(logbuf, sizeof(logbuf),
-        //     "OSS: Generating process with PID %i and putting it in queue %i at time %0d:%09d\n",
-        //     pcb->local_pid & 0xff, pcb->ptype, osclock.seconds(), osclock.nanoseconds());
-
-        //logger(logbuf);
-
-        shm_data->local_pid++;
-
-        execl("user_proc", "user_proc", strbuf, NULL);
-        exit(-1);
+        // osclock.add(0,1);
+        // // snprintf(logbuf, sizeof(logbuf),
+        // //     "OSS: Generating process with PID %i and putting it in queue %i at time %0d:%09d\n",
+        // //     pcb->local_pid & 0xff, pcb->ptype, osclock.seconds(), osclock.nanoseconds());
+        //
+        // //logger(logbuf);
+        //
+        // shm_data->local_pid++;
+        //
+        // execl("user_proc", "user_proc", strbuf, NULL);
+        // exit(-1);
     } else {
     }
 
@@ -182,14 +190,14 @@ PCB * createProcess() {
 
 
 /********** keep ************/
-
+/** initialize is working **/
 void initialize() {
     initializeSharedMemory();
     initializeMessageQueue();
-
+    printf("\nin initialize\n");
 		int i;
 		for (i = 0; i < 20; i++) {
-			rState->resource[i] = rand() % MAX + 1;
+			r_state->resource[i] = rand() % MAX + 1;
 		}
 
 		for (i = 0; i < 20; i++) {
@@ -197,10 +205,10 @@ void initialize() {
 		}
 		printf("\n");
 		for (i = 0; i < 20; i++) {
-			   printf(" %02d ", rState->resource[i]);
+			   printf(" %02d ", r_state->resource[i]);
 		}
 }
-
+ /** initializeSharedMemory is working **/
 void initializeSharedMemory() {
     int flags = 0;
 
@@ -241,6 +249,18 @@ void initializeSharedMemory() {
         memset((void *)shm_data, 0, sizeof(struct shared_data));
     }
     shm_data->local_pid = 1;
+
+    // attach the region to memory
+    r_state = (struct state*)shmat(shm_id, NULL, 0);
+
+    // if attach failed
+    if (r_state== (void*)-1) {
+        snprintf(perror_buf, sizeof(perror_buf), "%s: shmat: ", perror_arg0);
+        perror(perror_buf);
+        //return -1;
+    } else {
+        memset((void *)r_state, 0, sizeof(struct state));
+    }
 }
 
 void initializeMessageQueue() {
