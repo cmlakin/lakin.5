@@ -1,5 +1,6 @@
 #pragma once
 #include "osclock.h"
+#include "resource.h"
 
 
 typedef struct state {

@@ -17,6 +17,7 @@
 #include "shm.h"
 #include "oss.h"
 #include "queue.h"
+//#include "resource.h"
 
 /***
 	- allocate shm for data structures
@@ -46,7 +47,7 @@ int main(int argc, char ** argv){
         osclock.add(shm_data->launchSec, shm_data->launchNano);
     }
 
-    while (totalProcesses < 2) {
+    while (totalProcesses < 1) {
       scheduler();
     }
 
@@ -170,6 +171,8 @@ PCB * createProcess() {
         }
         printf("after for loop\n");
 
+        claimMatrix(pcb, pcbIndex);
+
         // osclock.add(0,1);
         // // snprintf(logbuf, sizeof(logbuf),
         // //     "OSS: Generating process with PID %i and putting it in queue %i at time %0d:%09d\n",
@@ -189,15 +192,16 @@ PCB * createProcess() {
     return pcb;
 }
 
+// ** Something not working right here, either first or last
 state * initializeResources() {
-    //state * r_state;
-
+    // initialize system resources
     printf("\nin initialize\n");
     int i;
     for (i = 0; i < 20; i++) {
-      shm_data->r_state.resource[i] = rand() % MAX + 1;
+      shm_data->r_state.resource[i] = shm_data->r_state.available[i] = rand() % MAX + 1;
     }
-
+    // print system resources
+    printf("\nSystem Resources:\n");
     for (i = 0; i < 20; i++) {
         printf("R%02d ", i);
     }
@@ -205,6 +209,45 @@ state * initializeResources() {
     for (i = 0; i < 20; i++) {
          printf(" %02d ", shm_data->r_state.resource[i]);
     }
+    // initialize available resources
+    // for (i = 0; i < 20; i++) {
+    //   shm_data->r_state.available[i] = shm_data->r_state.resource[i];
+    // }
+    printf("\nAvailable Resources:\n");
+    // print available resources
+    for (i = 0; i < 20; i++) {
+        printf("R%02d ", i);
+    }
+    printf("\n");
+    for (i = 0; i < 20; i++) {
+         printf(" %02d ", shm_data->r_state.available[i]);
+    }
+    printf("\n");
+}
+
+state * claimMatrix(PCB *pcb, int pcbIndex) {
+    int i, j;
+
+    for (j = 0; j < 20; j++){
+      shm_data->r_state.claim[pcbIndex][j] = pcb->rsrcsNeeded[j];
+
+    }
+
+    printf("\nClaim Matrix:\n");
+    printf("    ");
+    // print available resources
+    for (i = 0; i < 20; i++) {
+        printf("R%02d ", i);
+    }
+    for (i = 0; i < 18; i++) {
+      printf("\nP%02d ", i);
+      for(j = 0; j < 20; j++) {
+        printf(" %02d ", shm_data->r_state.claim[i][j]);
+      }
+    }
+    printf("\n");
+
+
 }
 
 /********** keep ************/

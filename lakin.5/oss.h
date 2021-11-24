@@ -22,6 +22,7 @@ void initializeSharedMemory();
 void initializeMessageQueue();
 struct proc_ctrl_blck  * createProcess();
 struct state * initializeResources();
+struct state * claimMatrix(PCB*, int);
 void requestResponse();
 void createMessageQueue();
 void launchNewProc();
