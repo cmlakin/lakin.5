@@ -47,12 +47,14 @@ int main(int argc, char ** argv){
         osclock.add(shm_data->launchSec, shm_data->launchNano);
     }
 
-    while (totalProcesses < 1) {
+    while (totalProcesses < 10) {
       scheduler();
     }
 
+    printClaimMatrix();
+
     deinitSharedMemory();
-    printf("\noss done\n");
+    //printf("\noss done\n");
     //bail();
     return 0;
 }
@@ -151,15 +153,15 @@ PCB * createProcess() {
         //printf("oss: local_pid %d\n",  pcb->local_pid & 0xff);
         //snprintf(strbuf, sizeof(strbuf), "%d", pcb->local_pid & 0xff);
         printf("\nin create process\n");
+        // int i;
+        // for (i = 0; i < 20; i++) {
+    		// 		printf("R%02d ", i);
+    		// }
+    		// printf("\n");
+    		// for (i = 0; i < 20; i++) {
+    		// 	   printf(" %02d ", shm_data->r_state.resource[i]);
+    		// }
         int i;
-        for (i = 0; i < 20; i++) {
-    				printf("R%02d ", i);
-    		}
-    		printf("\n");
-    		for (i = 0; i < 20; i++) {
-    			   printf(" %02d ", shm_data->r_state.resource[i]);
-    		}
-        //int i;
         int max = 0;
         printf("\n");
         for (i = 0; i < 20; i++) {
@@ -226,13 +228,16 @@ state * initializeResources() {
 }
 
 state * claimMatrix(PCB *pcb, int pcbIndex) {
-    int i, j;
+    int j;
 
     for (j = 0; j < 20; j++){
       shm_data->r_state.claim[pcbIndex][j] = pcb->rsrcsNeeded[j];
 
     }
+}
 
+void printClaimMatrix() {
+    int i, j;
     printf("\nClaim Matrix:\n");
     printf("    ");
     // print available resources
@@ -246,8 +251,6 @@ state * claimMatrix(PCB *pcb, int pcbIndex) {
       }
     }
     printf("\n");
-
-
 }
 
 /********** keep ************/

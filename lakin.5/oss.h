@@ -38,3 +38,4 @@ void sigHandler(const int);
 int initializeSig();
 void scheduler();
 int findAvailablePcb(void);
+void printClaimMatrix();
