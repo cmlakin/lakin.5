@@ -1,12 +1,12 @@
-#include "oss.h"
+//#include "oss.h"
 #include "shm.h"
-
 #include "config.h"
 #include "resource.h"
 
 state * initializeResources() {
     // initialize system resources and available resources
     printf("\nin initialize\n");
+    printf("\nMAX = %i\n", MAX);
     int i;
     for (i = 0; i < 20; i++) {
       shm_data->r_state.resource[i] = shm_data->r_state.available[i] = rand() % MAX + 1;

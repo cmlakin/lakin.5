@@ -1,5 +1,7 @@
 #pragma once
 //#include "shm.h"
+#include "config.h"
+
 
 const unsigned long maxTimeBetweenNewProcsNS = 100;
 const int maxTimeBetweenNewProcsSecs = 1;
