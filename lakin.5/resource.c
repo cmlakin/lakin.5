@@ -4,6 +4,8 @@
 #include "resource.h"
 
 state * initializeResources() {
+
+    shm_data = shmAttach();
     // initialize system resources and available resources
     printf("\nin initialize\n");
     printf("\nMAX = %i\n", MAX);

@@ -47,7 +47,7 @@ int main(int argc, char ** argv){
         osclock.add(shm_data->launchSec, shm_data->launchNano);
     }
 
-    while (totalProcesses < 3) {
+    while (totalProcesses == 0) {
       scheduler();
     }
 
@@ -184,7 +184,7 @@ PCB * createProcess() {
         //
         // shm_data->local_pid++;
         //
-        // execl("user_proc", "user_proc", strbuf, NULL);
+        execl("user_proc", "user_proc", NULL);
         // exit(-1);
     } else {
     }
@@ -206,44 +206,45 @@ void initialize() {
 }
  /** initializeSharedMemory is working **/
 void initializeSharedMemory() {
-    int flags = 0;
-
-    // set flags for shared memory creation
-    flags = (0666 | IPC_CREAT);
-
-    //snprintf(FTOK_BASE, PATH_MAX, "/tmp/oss.%u", getuid());
-
-    // make a key for our shared memory
-    key_t fkey = ftok(FTOK_BASE, FTOK_SHM);
-
-    if (fkey == -1) {
-        snprintf(perror_buf, sizeof(perror_buf), "%s: ftok: ", perror_arg0);
-        perror(perror_buf);
-        //return -1;
-    }
-
-    // get a shared memory region
-    shm_id = shmget(fkey, sizeof(struct shared_data), flags);
-
-    // if shmget failed
-    if (shm_id == -1) {
-        snprintf(perror_buf, sizeof(perror_buf), "%s: shmget: ", perror_arg0);
-        perror(perror_buf);
-        exit(0);
-        //return -1;
-    }
-
-    // attach the region to process memory
-    shm_data = (struct shared_data*)shmat(shm_id, NULL, 0);
-
-    // if attach failed
-    if (shm_data == (void*)-1) {
-        snprintf(perror_buf, sizeof(perror_buf), "%s: shmat: ", perror_arg0);
-        perror(perror_buf);
-        //return -1;
-    } else {
-        memset((void *)shm_data, 0, sizeof(struct shared_data));
-    }
+    // int flags = 0;
+    //
+    // // set flags for shared memory creation
+    // flags = (0666 | IPC_CREAT);
+    //
+    // //snprintf(FTOK_BASE, PATH_MAX, "/tmp/oss.%u", getuid());
+    //
+    // // make a key for our shared memory
+    // key_t fkey = ftok(FTOK_BASE, FTOK_SHM);
+    //
+    // if (fkey == -1) {
+    //     snprintf(perror_buf, sizeof(perror_buf), "%s: ftok: ", perror_arg0);
+    //     perror(perror_buf);
+    //     //return -1;
+    // }
+    //
+    // // get a shared memory region
+    // shm_id = shmget(fkey, sizeof(struct shared_data), flags);
+    //
+    // // if shmget failed
+    // if (shm_id == -1) {
+    //     snprintf(perror_buf, sizeof(perror_buf), "%s: shmget: ", perror_arg0);
+    //     perror(perror_buf);
+    //     exit(0);
+    //     //return -1;
+    // }
+    //
+    // // attach the region to process memory
+    // shm_data = (struct shared_data*)shmat(shm_id, NULL, 0);
+    //
+    // // if attach failed
+    // if (shm_data == (void*)-1) {
+    //     snprintf(perror_buf, sizeof(perror_buf), "%s: shmat: ", perror_arg0);
+    //     perror(perror_buf);
+    //     //return -1;
+    // } else {
+    //     memset((void *)shm_data, 0, sizeof(struct shared_data));
+    // }
+    shm_data = shmAttach();
     shm_data->local_pid = 1;
 }
 
