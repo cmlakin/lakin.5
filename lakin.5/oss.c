@@ -51,7 +51,7 @@ int main(int argc, char ** argv){
       scheduler();
     }
 
-    printClaimMatrix();
+    //printClaimMatrix();
 
     deinitSharedMemory();
     //printf("\noss done\n");
@@ -164,16 +164,29 @@ PCB * createProcess() {
         int i;
         int max = 0;
         printf("\n");
-        for (i = 0; i < 20; i++) {
-             printf(" %02d ", shm_data->r_state.resource[i]);
+        for (i = 0; i < RESOURCES; i++) {
+             //printf(" %02d ", shm_data->r_state.resource[i]);
              max = shm_data->r_state.resource[i] + 1;
-             printf("max = %02d ", max);
+             //printf("max = %02d ", max);
              pcb->rsrcsNeeded[i] = rand() % max;
-             printf("RN[%02d] = %02d\n", i, pcb->rsrcsNeeded[i]);
+             //printf("RN%02d = %02d ", i, pcb->rsrcsNeeded[i]);
         }
-        printf("after for loop\n");
 
-        claimMatrix(pcb, pcbIndex);
+        for (i = 0; i < RESOURCES; i++) {
+            printf("R%02d ", i);
+        }
+        printf("\n");
+        for (i = 0; i < RESOURCES; i++) {
+             printf(" %02d ", pcb->rsrcsNeeded[i]);
+        }
+        printf("\nafter for loop\n");
+
+
+
+        //claimMatrix(pcb, pcbIndex);
+        printf("after claim matrix\n");
+
+        printClaimMatrix();
 
         // osclock.add(0,1);
         // // snprintf(logbuf, sizeof(logbuf),

@@ -32,6 +32,7 @@
 #define MSG_RECV_OSS MSG_SEND_OSS
 
 #define PROCESSES 18
+#define RESOURCES 20
 #define LOG_FILENAME "oss.log"
 
 

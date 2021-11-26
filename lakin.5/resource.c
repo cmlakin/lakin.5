@@ -10,12 +10,12 @@ state * initializeResources() {
     printf("\nin initialize\n");
     printf("\nMAX = %i\n", MAX);
     int i;
-    for (i = 0; i < 20; i++) {
+    for (i = 0; i < RESOURCES; i++) {
       shm_data->r_state.resource[i] = shm_data->r_state.available[i] = rand() % MAX + 1;
     }
     // print system resources
     printf("\nSystem Resources:\n");
-    for (i = 0; i < 20; i++) {
+    for (i = 0; i < RESOURCES; i++) {
         printf("R%02d ", i);
     }
     printf("\n");
@@ -26,11 +26,11 @@ state * initializeResources() {
     // print available resources
     printf("\nAvailable Resources:\n");
     // print available resources
-    for (i = 0; i < 20; i++) {
+    for (i = 0; i < RESOURCES; i++) {
         printf("R%02d ", i);
     }
     printf("\n");
-    for (i = 0; i < 20; i++) {
+    for (i = 0; i < RESOURCES; i++) {
          printf(" %02d ", shm_data->r_state.available[i]);
     }
     printf("\n");
@@ -38,10 +38,19 @@ state * initializeResources() {
 // add process resources to claim matix
 state * claimMatrix(PCB *pcb, int pcbIndex) {
     int j;
+    printf("\npcb index: %i: ", pcbIndex);
+    for (j = 0; j < 20; j++){
+      printf("resource needed: %02d ", pcb->rsrcsNeeded[j]);
+      //shm_data->r_state.claim[pcbIndex][j] = pcb[pcbIndex].rsrcsNeeded[j];
+      //printf(" claim: %02d\n", shm_data->r_state.claim[pcbIndex][j]);
+    }
 
     for (j = 0; j < 20; j++){
-      shm_data->r_state.claim[pcbIndex][j] = pcb->rsrcsNeeded[j];
+      //printf("resource needed: %02d ", pcb->rsrcsNeeded[j]);
+      shm_data->r_state.claim[pcbIndex][j] = pcb[pcbIndex].rsrcsNeeded[j];
+      printf(" claim: %02d\n", shm_data->r_state.claim[pcbIndex][j]);
     }
+
 }
 
 // print claim matrix
@@ -50,13 +59,13 @@ void printClaimMatrix() {
     printf("\nClaim Matrix:\n");
     printf("    ");
     // print available resources
-    for (i = 0; i < 20; i++) {
+    for (i = 0; i < RESOURCES; i++) {
         printf("R%02d ", i);
     }
     printf("\n");
-    for (i = 0; i < 18; i++) {
+    for (i = 0; i < PROCESSES; i++) {
       printf("P%02d ", i);
-      for(j = 0; j < 20; j++) {
+      for(j = 0; j < RESOURCES; j++) {
         printf(" %02d ", shm_data->r_state.claim[i][j]);
       }
       printf("\n");
