@@ -38,17 +38,13 @@ state * initializeResources() {
 // add process resources to claim matix
 state * claimMatrix(PCB *pcb, int pcbIndex) {
     int j;
-    printf("\npcb index: %i: ", pcbIndex);
-    for (j = 0; j < 20; j++){
-      printf("resource needed: %02d ", pcb->rsrcsNeeded[j]);
-      //shm_data->r_state.claim[pcbIndex][j] = pcb[pcbIndex].rsrcsNeeded[j];
-      //printf(" claim: %02d\n", shm_data->r_state.claim[pcbIndex][j]);
-    }
+    printf("\nin claimMatrix()\n");
 
     for (j = 0; j < 20; j++){
       //printf("resource needed: %02d ", pcb->rsrcsNeeded[j]);
-      shm_data->r_state.claim[pcbIndex][j] = pcb[pcbIndex].rsrcsNeeded[j];
-      printf(" claim: %02d\n", shm_data->r_state.claim[pcbIndex][j]);
+      //printf("\npcb index: %i: ", pcbIndex);
+      shm_data->r_state.claim[pcbIndex][j] = pcb->rsrcsNeeded[j];
+      //printf(" claim: %02d\n", shm_data->r_state.claim[pcbIndex][j]);
     }
 
 }

@@ -47,11 +47,11 @@ int main(int argc, char ** argv){
         osclock.add(shm_data->launchSec, shm_data->launchNano);
     }
 
-    while (totalProcesses == 0) {
+    while (totalProcesses < 3) {
       scheduler();
     }
-
-    //printClaimMatrix();
+    sleep(3);
+    printClaimMatrix();
 
     deinitSharedMemory();
     //printf("\noss done\n");
@@ -183,10 +183,10 @@ PCB * createProcess() {
 
 
 
-        //claimMatrix(pcb, pcbIndex);
+        claimMatrix(pcb, pcbIndex);
         printf("after claim matrix\n");
 
-        printClaimMatrix();
+        //printClaimMatrix();
 
         // osclock.add(0,1);
         // // snprintf(logbuf, sizeof(logbuf),
