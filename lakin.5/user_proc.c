@@ -18,14 +18,7 @@
 
 char perror_buf[50];
 const char * perror_arg0 = "uprocess";
-//static char * FTOK_BASE[PATH_MAX];
 
-// static int shm_id;
-// static int msg_id;
-// static int foo;
-
-void uprocInitialize();
-void doit();
 void attachSharedMemory();
 
 char strbuf[20];
@@ -33,18 +26,35 @@ char strbuf[20];
 
 int main (int argc, char ** argv){
     printf("In user_proc\n");
-    // int id = atoi(argv[1]);
-    //
-    // foo = id;
-    //
-    // srand(getpid());
-    //
-    //
-    // uprocInitialize();
-    // attachSharedMemory();
-    // doit(id);
+
+    sem_t *semaphore = sem_open(SEM_NAME, O_RDWR);
+
+    if (semaphore == SEM_FAILED) {
+      perror("sem_open(3) failed\n");
+      exit(EXIT_FAILURE);
+    }
+
+    if (sem_wait(semaphore) < 0) {
+      perror("sem_wait(3) failed on child\n");
+      //continue;
+    }
+
+    printf("PID %ld aquired semaphore\n", (long) getpid());
+
+    if (sem_post(semaphore) < 0) {
+      perror("sem_post(3) error on child");
+    }
+
+    sleep(1);
+
+    if (sem_close(semaphore) < 0) {
+      perror("sem_close(3) failed\n");
+    }
+
     exit(0);
 }
+
+
 
 // void doit(int id) {
 //     while(1) {

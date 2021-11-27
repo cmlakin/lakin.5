@@ -7,38 +7,45 @@ state * initializeResources() {
 
     shm_data = shmAttach();
     // initialize system resources and available resources
-    printf("\nin initialize\n");
-    printf("\nMAX = %i\n", MAX);
-    int i;
+    // printf("\nin initialize\n");
+    // printf("\nMAX = %i\n", MAX);
+    int i, j;
     for (i = 0; i < RESOURCES; i++) {
       shm_data->r_state.resource[i] = shm_data->r_state.available[i] = rand() % MAX + 1;
     }
     // print system resources
-    printf("\nSystem Resources:\n");
-    for (i = 0; i < RESOURCES; i++) {
-        printf("R%02d ", i);
-    }
-    printf("\n");
-    for (i = 0; i < 20; i++) {
-         printf(" %02d ", shm_data->r_state.resource[i]);
-    }
+    // printf("\nSystem Resources:\n");
+    // for (i = 0; i < RESOURCES; i++) {
+    //     printf("R%02d ", i);
+    // }
+    // printf("\n");
+    // for (i = 0; i < RESOURCES; i++) {
+    //      printf(" %02d ", shm_data->r_state.resource[i]);
+    // }
+    //
+    // // print available resources
+    // printf("\nAvailable Resources:\n");
+    // // print available resources
+    // for (i = 0; i < RESOURCES; i++) {
+    //     printf("R%02d ", i);
+    // }
+    // printf("\n");
+    // for (i = 0; i < RESOURCES; i++) {
+    //      printf(" %02d ", shm_data->r_state.available[i]);
+    // }
+    // printf("\n");
 
-    // print available resources
-    printf("\nAvailable Resources:\n");
-    // print available resources
-    for (i = 0; i < RESOURCES; i++) {
-        printf("R%02d ", i);
+    // initialize claim and alloc arrays with all 0's
+    for (i = 0; i < PROCESSES; i++){
+      for (j = 0; j < RESOURCES; j++) {
+        shm_data->r_state.claim[i][j] = shm_data->r_state.alloc[i][j] = 0;
+      }
     }
-    printf("\n");
-    for (i = 0; i < RESOURCES; i++) {
-         printf(" %02d ", shm_data->r_state.available[i]);
-    }
-    printf("\n");
 }
 // add process resources to claim matix
 state * claimMatrix(PCB *pcb, int pcbIndex) {
     int j;
-    printf("\nin claimMatrix()\n");
+    //printf("\nin claimMatrix()\n");
 
     for (j = 0; j < 20; j++){
       //printf("resource needed: %02d ", pcb->rsrcsNeeded[j]);

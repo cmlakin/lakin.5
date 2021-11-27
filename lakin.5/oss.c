@@ -47,13 +47,19 @@ int main(int argc, char ** argv){
         osclock.add(shm_data->launchSec, shm_data->launchNano);
     }
 
-    while (totalProcesses < 3) {
+    while (totalProcesses < 1) {
       scheduler();
+      sleep(2);
     }
-    sleep(3);
-    printClaimMatrix();
+    sleep(1);
+    //printClaimMatrix();
 
     deinitSharedMemory();
+
+    if (sem_unlink(SEM_NAME) < 0) {
+      perror("sem_unlink(3) failed\n");
+    }
+    //sem_destroy(&semaphore);
     //printf("\noss done\n");
     //bail();
     return 0;
@@ -152,7 +158,7 @@ PCB * createProcess() {
 
         //printf("oss: local_pid %d\n",  pcb->local_pid & 0xff);
         //snprintf(strbuf, sizeof(strbuf), "%d", pcb->local_pid & 0xff);
-        printf("\nin create process\n");
+        //printf("\nin create process\n");
         // int i;
         // for (i = 0; i < 20; i++) {
     		// 		printf("R%02d ", i);
@@ -161,6 +167,7 @@ PCB * createProcess() {
     		// for (i = 0; i < 20; i++) {
     		// 	   printf(" %02d ", shm_data->r_state.resource[i]);
     		// }
+        srand(time(0));
         int i;
         int max = 0;
         printf("\n");
@@ -172,13 +179,13 @@ PCB * createProcess() {
              //printf("RN%02d = %02d ", i, pcb->rsrcsNeeded[i]);
         }
 
-        for (i = 0; i < RESOURCES; i++) {
-            printf("R%02d ", i);
-        }
-        printf("\n");
-        for (i = 0; i < RESOURCES; i++) {
-             printf(" %02d ", pcb->rsrcsNeeded[i]);
-        }
+        // for (i = 0; i < RESOURCES; i++) {
+        //     printf("R%02d ", i);
+        // }
+        // printf("\n");
+        // for (i = 0; i < RESOURCES; i++) {
+        //      printf(" %02d ", pcb->rsrcsNeeded[i]);
+        // }
         printf("\nafter for loop\n");
 
 
@@ -197,8 +204,12 @@ PCB * createProcess() {
         //
         // shm_data->local_pid++;
         //
-        execl("user_proc", "user_proc", NULL);
+        if (execl(CHILD_PROGRAM, CHILD_PROGRAM, NULL) < 0) {
+          perror("execl(2) failed\n");
+          exit(EXIT_FAILURE);
+        }
         // exit(-1);
+
     } else {
     }
 
@@ -214,68 +225,46 @@ PCB * createProcess() {
 
 void initialize() {
     initializeSharedMemory();
-    initializeMessageQueue();
+    //initializeMessageQueue();
     initializeResources();
+    initializeSemaphore();
 }
  /** initializeSharedMemory is working **/
 void initializeSharedMemory() {
-    // int flags = 0;
-    //
-    // // set flags for shared memory creation
-    // flags = (0666 | IPC_CREAT);
-    //
-    // //snprintf(FTOK_BASE, PATH_MAX, "/tmp/oss.%u", getuid());
-    //
-    // // make a key for our shared memory
-    // key_t fkey = ftok(FTOK_BASE, FTOK_SHM);
-    //
-    // if (fkey == -1) {
-    //     snprintf(perror_buf, sizeof(perror_buf), "%s: ftok: ", perror_arg0);
-    //     perror(perror_buf);
-    //     //return -1;
-    // }
-    //
-    // // get a shared memory region
-    // shm_id = shmget(fkey, sizeof(struct shared_data), flags);
-    //
-    // // if shmget failed
-    // if (shm_id == -1) {
-    //     snprintf(perror_buf, sizeof(perror_buf), "%s: shmget: ", perror_arg0);
-    //     perror(perror_buf);
-    //     exit(0);
-    //     //return -1;
-    // }
-    //
-    // // attach the region to process memory
-    // shm_data = (struct shared_data*)shmat(shm_id, NULL, 0);
-    //
-    // // if attach failed
-    // if (shm_data == (void*)-1) {
-    //     snprintf(perror_buf, sizeof(perror_buf), "%s: shmat: ", perror_arg0);
-    //     perror(perror_buf);
-    //     //return -1;
-    // } else {
-    //     memset((void *)shm_data, 0, sizeof(struct shared_data));
-    // }
     shm_data = shmAttach();
     shm_data->local_pid = 1;
 }
 
-void initializeMessageQueue() {
-    // messages
-    key_t msgkey = ftok(FTOK_BASE, FTOK_MSG);
+void initializeSemaphore() {
+  sem_t *semaphore = sem_open(SEM_NAME, O_CREAT | O_EXCL, SEM_PERMS, INITIAL_VALUE);
 
-    if (msgkey == -1) {
-        snprintf(perror_buf, sizeof(perror_buf), "%s: ftok: ", perror_arg0);
-        perror(perror_buf);
-        //return -1;
-    }
+  if (semaphore == SEM_FAILED) {
+    perror("sem_open(3) error\n");
+    exit(EXIT_FAILURE);
+  }
 
-    msg_id = msgget(msgkey, 0666 | IPC_CREAT);
-    if (msg_id == -1) {
-        printf("Error creating queue\n");
-    }
+  if (sem_close(semaphore) < 0) {
+    perror("sem_close(3) failed\n");
+    sem_unlink(SEM_NAME);
+    exit(EXIT_FAILURE);
+  }
 }
+
+// void initializeMessageQueue() {
+//     // messages
+//     key_t msgkey = ftok(FTOK_BASE, FTOK_MSG);
+//
+//     if (msgkey == -1) {
+//         snprintf(perror_buf, sizeof(perror_buf), "%s: ftok: ", perror_arg0);
+//         perror(perror_buf);
+//         //return -1;
+//     }
+//
+//     msg_id = msgget(msgkey, 0666 | IPC_CREAT);
+//     if (msg_id == -1) {
+//         printf("Error creating queue\n");
+//     }
+// }
 
 int findAvailablePcb(void) {
     int i;
