@@ -5,12 +5,10 @@
 
 
 typedef struct state {
-
 	int resource[20];
 	int available[20];
 	int claim[18][20];
 	int alloc[18][20];
-
 } state;
 
 typedef struct proc_ctrl_blck {
@@ -39,6 +37,7 @@ typedef struct shared_data {
 	struct state r_state;
 
 	// report stats
+	
 
 } shared_data;
 

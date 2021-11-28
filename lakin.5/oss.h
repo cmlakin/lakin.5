@@ -17,6 +17,7 @@ static int activeProcs = 0;
 //static int msg_id = -1;
 int g_bitVector = 0;
 char logbuf[200];
+char indBuf[2];
 pid_t pid;
 //sem_t semaphore;
 
