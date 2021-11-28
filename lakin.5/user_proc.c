@@ -34,25 +34,26 @@ int main (int argc, char ** argv){
 
     uprocInitialize();
     attachSharedMemory();
-
+    printf("\nbefore request\n");
     requestResources();
-
+    printf("\nafter request\n");
 
 
     exit(0);
 }
 
 void requestResources() {
+  printf("\nin request\n");
   int i;
   for (i = 0; i < RESOURCES; i ++) {
     request[i] = pcb->rsrcsNeeded[i];
   }
-
+  printf("\nbefore request print\n");
   printf("\nresources requested:\n");
   for (i = 0; i < RESOURCES; i++) {
     printf("%02d ", request[i]);
   }
-
+  printf("\nend of request\n");
 }
 
 void releaseResources() {
