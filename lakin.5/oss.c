@@ -129,6 +129,7 @@ PCB * createProcess() {
 
         claimMatrix(pcb, pcbIndex);
         printf("after claim matrix\n");
+        allocMatrix();
 
         //printClaimMatrix();
 
