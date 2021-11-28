@@ -65,6 +65,7 @@ static int totalProcesses = 0;
 static struct shared_data * shm_data = NULL;
 static int MAX = 10; // maximum number of resources
 static int request[20];
+static int testNum = 1;
 
 // #define MSG_SEND_UPROC 1
 // #define MSG_RECV_UPROC MSG_SEND_UPROC

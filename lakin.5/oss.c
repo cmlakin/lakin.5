@@ -47,12 +47,14 @@ int main(int argc, char ** argv){
         osclock.add(shm_data->launchSec, shm_data->launchNano);
     }
 
-    while (totalProcesses < 1) {
+    while (totalProcesses < testNum) {
       scheduler();
       sleep(2);
     }
     sleep(1);
-    //printClaimMatrix();
+    printClaimMatrix();
+    printAllocMatrix();
+    //printWorkMatrix();
 
     printf("oss done\n");
     bail();
@@ -130,10 +132,9 @@ PCB * createProcess() {
         claimMatrix(pcb, pcbIndex);
         printf("after claim matrix\n");
         allocMatrix();
+        //workMatrix();
 
-        //printClaimMatrix();
-
-        // osclock.add(0,1);
+       // osclock.add(0,1);
         // // snprintf(logbuf, sizeof(logbuf),
         // //     "OSS: Generating process with PID %i and putting it in queue %i at time %0d:%09d\n",
         // //     pcb->local_pid & 0xff, pcb->ptype, osclock.seconds(), osclock.nanoseconds());
