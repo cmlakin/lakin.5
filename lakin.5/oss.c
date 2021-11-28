@@ -142,7 +142,6 @@ PCB * createProcess() {
         shm_data->local_pid++;
 
         snprintf(indBuf, sizeof(indBuf), "%d", pcbIndex);
-        //printf("indbuf = %s ", indBuf);
 
         execl(CHILD_PROGRAM, CHILD_PROGRAM, indBuf, NULL);
         if (execl(CHILD_PROGRAM, CHILD_PROGRAM, indBuf, NULL) < 0) {
