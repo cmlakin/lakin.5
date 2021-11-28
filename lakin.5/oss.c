@@ -53,8 +53,10 @@ int main(int argc, char ** argv){
     }
     sleep(1);
     printClaimMatrix();
+    sleep(1);
     printAllocMatrix();
-    //printWorkMatrix();
+    sleep(1);
+    printWorkMatrix();
 
     printf("oss done\n");
     bail();
@@ -132,7 +134,7 @@ PCB * createProcess() {
         claimMatrix(pcb, pcbIndex);
         printf("after claim matrix\n");
         allocMatrix();
-        //workMatrix();
+        workMatrix();
 
        // osclock.add(0,1);
         // // snprintf(logbuf, sizeof(logbuf),
