@@ -120,7 +120,7 @@ void printClaimMatrix() {
       printf("\n");
     }
     printf("\n");
-    exit(-1);
+    //exit(-1);
 }
 
 // print alloc matrix
@@ -141,7 +141,7 @@ void printAllocMatrix() {
       printf("\n");
     }
     printf("\n");
-    exit(-1);
+    //exit(-1);
 }
 
 // print work matrix
@@ -162,5 +162,5 @@ void printWorkMatrix() {
       printf("\n");
     }
     printf("\n");
-    exit(-1);
+    //exit(-1);
 }
