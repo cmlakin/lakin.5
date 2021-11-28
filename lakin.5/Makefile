@@ -6,10 +6,10 @@ CFLAGS= -g -Wall
 all: oss user_proc
 
 clean:
-	rm *.o oss user_proc 
+	rm *.o oss user_proc
 
-oss: oss.o queue.o osclock.o shm.o
-	$(GCC) $(CFLAGS) oss.o queue.o osclock.o shm.o -o oss
+oss: oss.o queue.o osclock.o shm.o resource.o
+	$(GCC) $(CFLAGS) oss.o queue.o osclock.o shm.o resource.o -o oss
 
 oss.o: oss.c oss.h config.h osclock.h
 	$(GCC) $(CFLAGS) -c oss.c
@@ -28,3 +28,6 @@ shm.o: shm.c shm.h
 
 queue.o: queue.c queue.h
 	$(GCC) $(CFLAGS) -c queue.c
+
+resource.o: resource.c resource.h shm.h
+	$(GCC) $(CFLAGS) -c resource.c

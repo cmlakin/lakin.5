@@ -1,5 +1,7 @@
+#include "user_proc.h"
 #include "config.h"
 #include "shm.h"
+
 
 /***
 	-request resource
@@ -17,64 +19,74 @@
 ***/
 
 char perror_buf[50];
-const char * perror_arg0 = "uprocess";
-//static char * FTOK_BASE[PATH_MAX];
+const char * perror_arg1 = "user_proc";
 
-static int shm_id;
-static int msg_id;
-static int foo;
-
-void uprocInitialize();
-void doit();
 void attachSharedMemory();
 
 char strbuf[20];
-
+PCB * pcb;
 
 int main (int argc, char ** argv){
-    printf("In user_proc\n");
-    int id = atoi(argv[1]);
+    printf("In user_proc %s\n", argv[1]);
 
-    foo = id;
-
-    srand(getpid());
-
-
+    id = atoi(argv[1]);
+    //pcb = &shm_data->ptab.pcb[id];
+    //printf("pcb local pid: %i\n", pcb->local_pid);
+    printf("id= %i ", id);
     uprocInitialize();
     attachSharedMemory();
-    doit(id);
+    printf("\nbefore request\n");
+    requestResources();
+    printf("\nafter request\n");
+
+    sem_unlink(SEM_NAME);
+    return 0;
 }
 
-void doit(int id) {
-    while(1) {
-        ipcmsg msg;
+void requestResources() {
+  printf("\nin request\n");
+  int i;
+  for (i = 0; i < RESOURCES; i ++) {
+    request[i] = shm_data->ptab.pcb[id].rsrcsNeeded[i];
+    printf("%02d ", request[i]);
+  }
+  printf("\nbefore request print\n");
+  printf("\nresources requested:\n");
+  // for (i = 0; i < RESOURCES; i++) {
+  //   printf("%02d ", request[i]);
+  // }
+  printf("\nend of request\n");
+}
 
-        msg.mtype = msg.ossid;
+void releaseResources() {
 
-        // strcpy(msg.mtext, strbuf);
-        // snprintf(&msg.mtext[0],sizeof(msg.mtext), "from %ld",  id);
-        if (msgsnd(msg_id, (void *)&msg, sizeof(msg), 0) == -1) {
-            printf("oss msg not sent");
-        }
-        id = foo;
-
-				if(msgrcv(msg_id, (void *)&msg, sizeof(ipcmsg), id + 1, 0) == -1) {
-            printf("error receving message\n");
-            exit(-1);
-        }
-    }
 }
 
 void uprocInitialize(){
-    key_t sndkey = ftok(FTOK_BASE, FTOK_MSG);
+  sem_t *semaphore = sem_open(SEM_NAME, O_RDWR);
 
-    if (sndkey == -1) {
+  if (semaphore == SEM_FAILED) {
+    perror("sem_open(3) failed\n");
+    exit(EXIT_FAILURE);
+  }
 
-        snprintf(perror_buf, sizeof(perror_buf), "%s: ftok: ", perror_arg0);
-        perror(perror_buf);
-    }
+  if (sem_wait(semaphore) < 0) {
+    perror("sem_wait(3) failed on child\n");
+    //continue;
+  }
 
-    msg_id=msgget(sndkey, 0666 );
+  printf("PID %ld aquired semaphore\n", (long) getpid());
+
+  if (sem_post(semaphore) < 0) {
+    perror("sem_post(3) error on child");
+  }
+
+  sleep(1);
+
+  if (sem_close(semaphore) < 0) {
+    perror("sem_close(3) failed\n");
+  }
+
 }
 
 void attachSharedMemory() {
@@ -83,10 +95,34 @@ void attachSharedMemory() {
     shm_id = shmget(fkey, sizeof(struct shared_data), 0666 | IPC_CREAT);
 
     if(shm_id == -1) {
-        snprintf(perror_buf, sizeof(perror_buf), "%s: shmget: ", perror_arg0);
+        snprintf(perror_buf, sizeof(perror_buf), "%s: shmget: ", perror_arg1);
         perror(perror_buf);
         return;
     }
 
     shm_data = (struct shared_data*)shmat(shm_id, NULL, 0);
 }
+
+
+/************** keep if needed for later ***************/
+
+// void doit(int id) {
+//     while(1) {
+//         ipcmsg msg;
+//
+//         msg.mtype = msg.ossid;
+//
+//         // strcpy(msg.mtext, strbuf);
+//         // snprintf(&msg.mtext[0],sizeof(msg.mtext), "from %ld",  id);
+//         if (msgsnd(msg_id, (void *)&msg, sizeof(msg), 0) == -1) {
+//             printf("oss msg not sent");
+//         }
+//         id = foo;
+//
+// 				if(msgrcv(msg_id, (void *)&msg, sizeof(ipcmsg), id + 1, 0) == -1) {
+//             printf("error receving message\n");
+//             exit(-1);
+//         }
+//     }
+// }
+//

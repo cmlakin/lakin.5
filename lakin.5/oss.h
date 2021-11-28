@@ -1,5 +1,7 @@
 #pragma once
 //#include "shm.h"
+#include "config.h"
+
 
 const unsigned long maxTimeBetweenNewProcsNS = 100;
 const int maxTimeBetweenNewProcsSecs = 1;
@@ -12,17 +14,17 @@ static int shm_id = -1; // shared memory identifier
 //static int totProcsCreated = 0;
 static int allocatedProcs = 0;
 static int activeProcs = 0;
-static int msg_id = -1;
+//static int msg_id = -1;
 int g_bitVector = 0;
 char logbuf[200];
+char indBuf[2];
 pid_t pid;
+//sem_t semaphore;
 
 void initialize();
 void initializeSharedMemory();
-void initializeMessageQueue();
+//void initializeMessageQueue();
 struct proc_ctrl_blck  * createProcess();
-struct state * initializeResources();
-struct state * claimMatrix(PCB*, int);
 void requestResponse();
 void createMessageQueue();
 void launchNewProc();
@@ -38,3 +40,4 @@ void sigHandler(const int);
 int initializeSig();
 void scheduler();
 int findAvailablePcb(void);
+void initializeSemaphore();

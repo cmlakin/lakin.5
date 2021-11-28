@@ -1,25 +1,24 @@
 #pragma once
 #include "osclock.h"
-#include "resource.h"
+#include "config.h"
+
 
 
 typedef struct state {
-
-	int resource[19];
-	int available[19];
-	int claim[17][19];
-	int alloc[17][19];
-
+	int resource[20];
+	int available[20];
+	int claim[18][20];
+	int alloc[18][20];
 } state;
 
 typedef struct proc_ctrl_blck {
 	int pid;
 	int local_pid;
-	int rsrcsNeeded[19]; // fill randomly
+	int rsrcsNeeded[20]; // fill randomly
 } PCB;
 
 typedef struct proc_table {
-	struct proc_ctrl_blck pcb[17];
+	struct proc_ctrl_blck pcb[18];
 } proc_table;
 
 // shared memory
@@ -38,6 +37,7 @@ typedef struct shared_data {
 	struct state r_state;
 
 	// report stats
+	
 
 } shared_data;
 

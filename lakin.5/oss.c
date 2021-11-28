@@ -17,7 +17,7 @@
 #include "shm.h"
 #include "oss.h"
 #include "queue.h"
-//#include "resource.h"
+#include "resource.h"
 
 /***
 	- allocate shm for data structures
@@ -33,7 +33,7 @@
 	-fork children at random times (1-500 milliseconds of loggerical clock)
 
 ***/
-
+//
 
 int main(int argc, char ** argv){
 
@@ -49,11 +49,13 @@ int main(int argc, char ** argv){
 
     while (totalProcesses < 1) {
       scheduler();
+      sleep(2);
     }
+    sleep(1);
+    //printClaimMatrix();
 
-    deinitSharedMemory();
-    printf("\noss done\n");
-    //bail();
+    printf("oss done\n");
+    bail();
     return 0;
 }
 
@@ -63,61 +65,7 @@ void scheduler() {
 
     foo = createProcess();
 
-    // while(totalProcesses < 2) {
-    //
-    //     if (activeProcs < 2) {
-    //         int create = osclock.seconds() > shm_data->launchSec;
-    //
-    //         if(!create && osclock.seconds()) {
-    //             create = osclock.seconds() > shm_data->launchSec
-		// 						&& osclock.nanoseconds() >= shm_data->launchNano;
-    //         }
-    //         if(create) {
-    //             // printf("current %0d:%09d\n", osclock.seconds(), osclock.nanoseconds());
-    //             // printf("lanuch  %0d:%09d\n", shm_data->launchSec, shm_data->launchNano);
-    //             foo = createProcess();
-    //             launchNewProc();
-    //         }
-    //     }
-    //     osclock.add(0,1000000);
-    //     //sleep(1);
-    // }
-    //printf("total processes = 40\n");
-    //bail();
 }
-
-/** alter to fit current project **/
-// void requestResponse(PCB *pcb) {
-//     printf("oss: dispatch %d\n", pcb->local_pid & 0xff);
-//
-//     // create msg to send to uproc
-//     struct ipcmsg send;
-//     struct ipcmsg recv;
-//
-//     printf("oss: waiting for msg\n");
-//
-//     while(msgrcv(msg_id, (void *)&recv, sizeof(recv), send.ossid, 0) == -1) {
-//         printf("oss: waiting for msg error %d\n", errno);
-//     }
-//
-//     printf("oss msg received: %s\n", recv.mtext);
-//
-// 		memset((void *)&send, 0, sizeof(send));
-//     send.mtype = (pcb->local_pid & 0xff) + 1;
-//     send.ossid = send.mtype;
-//     strcpy(send.mtext, "foo");
-//
-//     while (msgsnd(msg_id, (void *)&send, sizeof(send), 0) == -1) {
-//         printf("oss: msg not sent to %d error %d\n", (int)send.mtype, errno);
-//         sleep(1);
-//     }
-//
-//     printf("oss: msg sent to %d\n", (int)send.mtype);
-//     printf("msg_id %i\n", msg_id);
-//
-// }
-
-/*** change to fit new project ***/
 
 PCB * createProcess() {
     printf("\ncreateProcess\n");
@@ -150,28 +98,39 @@ PCB * createProcess() {
 
         //printf("oss: local_pid %d\n",  pcb->local_pid & 0xff);
         //snprintf(strbuf, sizeof(strbuf), "%d", pcb->local_pid & 0xff);
-        printf("\nin create process\n");
+        //printf("\nin create process\n");
+        // int i;
+        // for (i = 0; i < 20; i++) {
+    		// 		printf("R%02d ", i);
+    		// }
+    		// printf("\n");
+    		// for (i = 0; i < 20; i++) {
+    		// 	   printf(" %02d ", shm_data->r_state.resource[i]);
+    		// }
+        srand(time(0));
         int i;
-        for (i = 0; i < 20; i++) {
-    				printf("R%02d ", i);
-    		}
-    		printf("\n");
-    		for (i = 0; i < 20; i++) {
-    			   printf(" %02d ", shm_data->r_state.resource[i]);
-    		}
-        //int i;
         int max = 0;
         printf("\n");
-        for (i = 0; i < 20; i++) {
-             printf(" %02d ", shm_data->r_state.resource[i]);
+        for (i = 0; i < RESOURCES; i++) {
+             //printf(" %02d ", shm_data->r_state.resource[i]);
              max = shm_data->r_state.resource[i] + 1;
-             printf("max = %02d ", max);
+             //printf("max = %02d ", max);
              pcb->rsrcsNeeded[i] = rand() % max;
-             printf("RN[%02d] = %02d\n", i, pcb->rsrcsNeeded[i]);
+             //printf("RN%02d = %02d ", i, pcb->rsrcsNeeded[i]);
         }
-        printf("after for loop\n");
+
+        // for (i = 0; i < RESOURCES; i++) {
+        //     printf("R%02d ", i);
+        // }
+        // printf("\n");
+        // for (i = 0; i < RESOURCES; i++) {
+        //      printf(" %02d ", pcb->rsrcsNeeded[i]);
+        // }
 
         claimMatrix(pcb, pcbIndex);
+        printf("after claim matrix\n");
+
+        //printClaimMatrix();
 
         // osclock.add(0,1);
         // // snprintf(logbuf, sizeof(logbuf),
@@ -179,141 +138,49 @@ PCB * createProcess() {
         // //     pcb->local_pid & 0xff, pcb->ptype, osclock.seconds(), osclock.nanoseconds());
         //
         // //logger(logbuf);
-        //
-        // shm_data->local_pid++;
-        //
-        // execl("user_proc", "user_proc", strbuf, NULL);
+
+        shm_data->local_pid++;
+
+        snprintf(indBuf, sizeof(indBuf), "%d", pcbIndex);
+
+        execl(CHILD_PROGRAM, CHILD_PROGRAM, indBuf, NULL);
+        if (execl(CHILD_PROGRAM, CHILD_PROGRAM, indBuf, NULL) < 0) {
+          perror("execl(2) failed\n");
+          exit(EXIT_FAILURE);
+        }
         // exit(-1);
+
     } else {
     }
-
 
     osclock.add(0,1);
     return pcb;
 }
 
-// ** Something not working right here, either first or last
-state * initializeResources() {
-    // initialize system resources
-    printf("\nin initialize\n");
-    int i;
-    for (i = 0; i < 20; i++) {
-      shm_data->r_state.resource[i] = shm_data->r_state.available[i] = rand() % MAX + 1;
-    }
-    // print system resources
-    printf("\nSystem Resources:\n");
-    for (i = 0; i < 20; i++) {
-        printf("R%02d ", i);
-    }
-    printf("\n");
-    for (i = 0; i < 20; i++) {
-         printf(" %02d ", shm_data->r_state.resource[i]);
-    }
-    // initialize available resources
-    // for (i = 0; i < 20; i++) {
-    //   shm_data->r_state.available[i] = shm_data->r_state.resource[i];
-    // }
-    printf("\nAvailable Resources:\n");
-    // print available resources
-    for (i = 0; i < 20; i++) {
-        printf("R%02d ", i);
-    }
-    printf("\n");
-    for (i = 0; i < 20; i++) {
-         printf(" %02d ", shm_data->r_state.available[i]);
-    }
-    printf("\n");
-}
-
-state * claimMatrix(PCB *pcb, int pcbIndex) {
-    int i, j;
-
-    for (j = 0; j < 20; j++){
-      shm_data->r_state.claim[pcbIndex][j] = pcb->rsrcsNeeded[j];
-
-    }
-
-    printf("\nClaim Matrix:\n");
-    printf("    ");
-    // print available resources
-    for (i = 0; i < 20; i++) {
-        printf("R%02d ", i);
-    }
-    for (i = 0; i < 18; i++) {
-      printf("\nP%02d ", i);
-      for(j = 0; j < 20; j++) {
-        printf(" %02d ", shm_data->r_state.claim[i][j]);
-      }
-    }
-    printf("\n");
-
-
-}
-
-/********** keep ************/
-
 void initialize() {
     initializeSharedMemory();
-    initializeMessageQueue();
     initializeResources();
+    initializeSemaphore();
 }
- /** initializeSharedMemory is working **/
+
 void initializeSharedMemory() {
-    int flags = 0;
-
-    // set flags for shared memory creation
-    flags = (0666 | IPC_CREAT);
-
-    //snprintf(FTOK_BASE, PATH_MAX, "/tmp/oss.%u", getuid());
-
-    // make a key for our shared memory
-    key_t fkey = ftok(FTOK_BASE, FTOK_SHM);
-
-    if (fkey == -1) {
-        snprintf(perror_buf, sizeof(perror_buf), "%s: ftok: ", perror_arg0);
-        perror(perror_buf);
-        //return -1;
-    }
-
-    // get a shared memory region
-    shm_id = shmget(fkey, sizeof(struct shared_data), flags);
-
-    // if shmget failed
-    if (shm_id == -1) {
-        snprintf(perror_buf, sizeof(perror_buf), "%s: shmget: ", perror_arg0);
-        perror(perror_buf);
-        exit(0);
-        //return -1;
-    }
-
-    // attach the region to process memory
-    shm_data = (struct shared_data*)shmat(shm_id, NULL, 0);
-
-    // if attach failed
-    if (shm_data == (void*)-1) {
-        snprintf(perror_buf, sizeof(perror_buf), "%s: shmat: ", perror_arg0);
-        perror(perror_buf);
-        //return -1;
-    } else {
-        memset((void *)shm_data, 0, sizeof(struct shared_data));
-    }
+    shm_data = shmAttach();
     shm_data->local_pid = 1;
 }
 
-void initializeMessageQueue() {
-    // messages
-    key_t msgkey = ftok(FTOK_BASE, FTOK_MSG);
+void initializeSemaphore() {
+  sem_t *semaphore = sem_open(SEM_NAME, O_CREAT | O_EXCL, SEM_PERMS, INITIAL_VALUE);
 
-    if (msgkey == -1) {
-        snprintf(perror_buf, sizeof(perror_buf), "%s: ftok: ", perror_arg0);
-        perror(perror_buf);
-        //return -1;
-    }
+  if (semaphore == SEM_FAILED) {
+    perror("sem_open(3) error\n");
+    exit(EXIT_FAILURE);
+  }
 
-    msg_id = msgget(msgkey, 0666 | IPC_CREAT);
-    if (msg_id == -1) {
-        printf("Error creating queue\n");
-    }
+  if (sem_close(semaphore) < 0) {
+    perror("sem_close(3) failed\n");
+    sem_unlink(SEM_NAME);
+    exit(EXIT_FAILURE);
+  }
 }
 
 int findAvailablePcb(void) {
@@ -332,7 +199,6 @@ int findAvailablePcb(void) {
     return -1;
 }
 
-
 void launchNewProc() {
     //set new launch values;
     shm_data->launchSec = rand() % maxTimeBetweenNewProcsSecs + 1;
@@ -344,7 +210,6 @@ void launchNewProc() {
     shm_data->launchNano += osclock.nanoseconds();
     // printf("new launch %i.%i\n", shm_data->launchSec, shm_data->launchNano);
 }
-
 
 void ossClock() {
     // set up initial clock values operated by oss
@@ -397,54 +262,226 @@ void clearBit(int b) {
     g_bitVector &= ~(1 << b);
 }
 
-// void doSigHandler(int sig) {
-//     if (sig == SIGTERM) {
-//         // kill child process - reconfig to work with current code
-//         kill(getpid(), SIGKILL); // resend to child
+void doSigHandler(int sig) {
+    if (sig == SIGTERM) {
+        // kill child process - reconfig to work with current code
+        kill(getpid(), SIGKILL); // resend to child
+    }
+}
+
+void bail() {
+    kill(0, SIGTERM);
+    deinitSharedMemory();
+    sem_unlink(SEM_NAME);
+    if (sem_unlink(SEM_NAME) < 0) {
+      perror("sem_unlink(3) failed\n");
+    }
+    exit(0);
+}
+
+void sigHandler(const int sig) {
+    sigset_t mask, oldmask;
+    sigfillset(&mask);
+
+    // block all signals
+    sigprocmask(SIG_SETMASK, &mask, &oldmask);
+
+    if (sig == SIGINT) {
+        printf("oss[%d]: Ctrl-C received\n", getpid());
+        bail();
+    }
+    else if (sig == SIGALRM) {
+        printf("oss[%d]: Alarm raised\n", getpid());
+        bail();
+    }
+    sigprocmask(SIG_SETMASK, &oldmask, NULL);
+}
+
+int initializeSig() {
+    struct sigaction sa;
+    sa.sa_flags = 0;
+    sigemptyset(&sa.sa_mask); // ignore next signals
+
+    if(sigaction(SIGTERM, &sa, NULL) == -1) {
+        perror("sigaction");
+        return -1;
+    }
+
+    // alarm and Ctrl-C(SIGINT) have to be handled
+    sa.sa_handler = sigHandler;
+    if ((sigaction(SIGALRM, &sa, NULL) == -1) ||    (sigaction(SIGINT, &sa, NULL) == -1)) {
+        perror("sigaction");
+        return -1;
+    }
+    alarm(ALARM_TIME);
+    return 0;
+}
+
+
+/************** keep for future use if needed ***********************/
+
+
+// void scheduler() {
+//     PCB * foo;
+//
+//     foo = createProcess();
+//
+//     // while(totalProcesses < 2) {
+//     //
+//     //     if (activeProcs < 2) {
+//     //         int create = osclock.seconds() > shm_data->launchSec;
+//     //
+//     //         if(!create && osclock.seconds()) {
+//     //             create = osclock.seconds() > shm_data->launchSec
+// 		// 						&& osclock.nanoseconds() >= shm_data->launchNano;
+//     //         }
+//     //         if(create) {
+//     //             // printf("current %0d:%09d\n", osclock.seconds(), osclock.nanoseconds());
+//     //             // printf("lanuch  %0d:%09d\n", shm_data->launchSec, shm_data->launchNano);
+//     //             foo = createProcess();
+//     //             launchNewProc();
+//     //         }
+//     //     }
+//     //     osclock.add(0,1000000);
+//     //     //sleep(1);
+//     // }
+//     //printf("total processes = 40\n");
+//     //bail();
+// }
+
+/** alter to fit current project **/
+// void requestResponse(PCB *pcb) {
+//     printf("oss: dispatch %d\n", pcb->local_pid & 0xff);
+//
+//     // create msg to send to uproc
+//     struct ipcmsg send;
+//     struct ipcmsg recv;
+//
+//     printf("oss: waiting for msg\n");
+//
+//     while(msgrcv(msg_id, (void *)&recv, sizeof(recv), send.ossid, 0) == -1) {
+//         printf("oss: waiting for msg error %d\n", errno);
+//     }
+//
+//     printf("oss msg received: %s\n", recv.mtext);
+//
+// 		memset((void *)&send, 0, sizeof(send));
+//     send.mtype = (pcb->local_pid & 0xff) + 1;
+//     send.ossid = send.mtype;
+//     strcpy(send.mtext, "foo");
+//
+//     while (msgsnd(msg_id, (void *)&send, sizeof(send), 0) == -1) {
+//         printf("oss: msg not sent to %d error %d\n", (int)send.mtype, errno);
+//         sleep(1);
+//     }
+//
+//     printf("oss: msg sent to %d\n", (int)send.mtype);
+//     printf("msg_id %i\n", msg_id);
+//
+// }
+
+// void initializeMessageQueue() {
+//     // messages
+//     key_t msgkey = ftok(FTOK_BASE, FTOK_MSG);
+//
+//     if (msgkey == -1) {
+//         snprintf(perror_buf, sizeof(perror_buf), "%s: ftok: ", perror_arg0);
+//         perror(perror_buf);
+//         //return -1;
+//     }
+//
+//     msg_id = msgget(msgkey, 0666 | IPC_CREAT);
+//     if (msg_id == -1) {
+//         printf("Error creating queue\n");
 //     }
 // }
+
+// PCB * createProcess() {
+//     printf("\ncreateProcess\n");
+//     // activeProcs++;
+//     totalProcesses++;
 //
-// void bail() {
-//     kill(0, SIGTERM);
-//     deinitSharedMemory();
-//     exit(0);
-// }
+//     PCB *pcb;
 //
-//
-// void sigHandler(const int sig) {
-//     sigset_t mask, oldmask;
-//     sigfillset(&mask);
-//
-//     // block all signals
-//     sigprocmask(SIG_SETMASK, &mask, &oldmask);
-//
-//     if (sig == SIGINT) {
-//         printf("oss[%d]: Ctrl-C received\n", getpid());
-//         bail();
+//     // find available pcb and initialize first values
+//     int pcbIndex = findAvailablePcb();
+//     if(pcbIndex == -1) {
+//         printf("oss: createProcess: no free pcbs\n");
+//         return NULL;
 //     }
-//     else if (sig == SIGALRM) {
-//         printf("oss[%d]: Alarm raised\n", getpid());
-//         bail();
-//     }
-//     sigprocmask(SIG_SETMASK, &oldmask, NULL);
-// }
+//     //printf("oss: createProcess: available pcb %d\n", pcbIndex);
+//     setBit(pcbIndex);
+//     allocatedProcs++;
 //
-// int initializeSig() {
-//     struct sigaction sa;
-//     sa.sa_flags = 0;
-//     sigemptyset(&sa.sa_mask); // ignore next signals
+//     pcb = &shm_data->ptab.pcb[pcbIndex];
 //
-//     if(sigaction(SIGTERM, &sa, NULL) == -1) {
-//         perror("sigaction");
-//         return -1;
+//     pid = pcb->pid = fork();
+//
+//     if (pid == -1) {
+//         perror("Failed to create new process\n");
+//         return NULL;
+//     } else if (pid == 0) {
+//         //char strbuf[16];
+//
+//         pcb->local_pid = shm_data->local_pid << 8 | pcbIndex;
+//
+//         //printf("oss: local_pid %d\n",  pcb->local_pid & 0xff);
+//         //snprintf(strbuf, sizeof(strbuf), "%d", pcb->local_pid & 0xff);
+//         //printf("\nin create process\n");
+//         // int i;
+//         // for (i = 0; i < 20; i++) {
+//     		// 		printf("R%02d ", i);
+//     		// }
+//     		// printf("\n");
+//     		// for (i = 0; i < 20; i++) {
+//     		// 	   printf(" %02d ", shm_data->r_state.resource[i]);
+//     		// }
+//         srand(time(0));
+//         int i;
+//         int max = 0;
+//         printf("\n");
+//         for (i = 0; i < RESOURCES; i++) {
+//              //printf(" %02d ", shm_data->r_state.resource[i]);
+//              max = shm_data->r_state.resource[i] + 1;
+//              //printf("max = %02d ", max);
+//              pcb->rsrcsNeeded[i] = rand() % max;
+//              //printf("RN%02d = %02d ", i, pcb->rsrcsNeeded[i]);
+//         }
+//
+//         // for (i = 0; i < RESOURCES; i++) {
+//         //     printf("R%02d ", i);
+//         // }
+//         // printf("\n");
+//         // for (i = 0; i < RESOURCES; i++) {
+//         //      printf(" %02d ", pcb->rsrcsNeeded[i]);
+//         // }
+//         printf("\nafter for loop\n");
+//
+//
+//
+//         claimMatrix(pcb, pcbIndex);
+//         printf("after claim matrix\n");
+//
+//         //printClaimMatrix();
+//
+//         // osclock.add(0,1);
+//         // // snprintf(logbuf, sizeof(logbuf),
+//         // //     "OSS: Generating process with PID %i and putting it in queue %i at time %0d:%09d\n",
+//         // //     pcb->local_pid & 0xff, pcb->ptype, osclock.seconds(), osclock.nanoseconds());
+//         //
+//         // //logger(logbuf);
+//         //
+//         // shm_data->local_pid++;
+//         //
+//         if (execl(CHILD_PROGRAM, CHILD_PROGRAM, NULL) < 0) {
+//           perror("execl(2) failed\n");
+//           exit(EXIT_FAILURE);
+//         }
+//         // exit(-1);
+//
+//     } else {
 //     }
 //
-//     // alarm and Ctrl-C(SIGINT) have to be handled
-//     sa.sa_handler = sigHandler;
-//     if ((sigaction(SIGALRM, &sa, NULL) == -1) ||    (sigaction(SIGINT, &sa, NULL) == -1)) {
-//         perror("sigaction");
-//         return -1;
-//     }
-//     alarm(ALARM_TIME);
-//     return 0;
+//     osclock.add(0,1);
+//     return pcb;
 // }
