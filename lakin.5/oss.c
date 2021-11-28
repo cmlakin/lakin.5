@@ -133,8 +133,7 @@ PCB * createProcess() {
 
         claimMatrix(pcb, pcbIndex);
         printf("after claim matrix\n");
-        allocMatrix();
-        workMatrix();
+
 
        // osclock.add(0,1);
         // // snprintf(logbuf, sizeof(logbuf),

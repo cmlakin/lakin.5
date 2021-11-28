@@ -47,7 +47,7 @@ void requestResources() {
   printf("\nin request\n");
   int i;
   for (i = 0; i < RESOURCES; i ++) {
-    //request[i] = shm_data->r_state.work[id][i];
+    request[i] = shm_data->r_state.work[id][i];
     printf("%02d ", request[i]);
   }
   printf("\nbefore request print\n");
@@ -56,6 +56,7 @@ void requestResources() {
   //   printf("%02d ", request[i]);
   // }
   printf("\nend of request\n");
+  checkRequest(id);
 }
 
 void releaseResources() {

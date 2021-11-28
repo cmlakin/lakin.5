@@ -55,6 +55,7 @@ state * claimMatrix(PCB *pcb, int pcbIndex) {
       shm_data->r_state.claim[pcbIndex][j] = pcb->rsrcsNeeded[j];
       //printf(" %02d ", shm_data->r_state.claim[pcbIndex][j]);
     }
+    allocMatrix();
 }
 
 // initialize allocated values when process is added to claim matrix
@@ -77,6 +78,7 @@ state * allocMatrix() {
    }
    //printAllocMatrix();
    printf("alloc done\n");
+   workMatrix();
 }
 
 // initialize work matrix (claim - alloc)
