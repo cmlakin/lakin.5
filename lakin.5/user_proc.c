@@ -47,7 +47,7 @@ void requestResources() {
   printf("\nin request\n");
   int i;
   for (i = 0; i < RESOURCES; i ++) {
-    request[i] = shm_data->ptab.pcb[id].rsrcsNeeded[i];
+    //request[i] = shm_data->r_state.work[id][i];
     printf("%02d ", request[i]);
   }
   printf("\nbefore request print\n");
