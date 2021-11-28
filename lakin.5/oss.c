@@ -54,7 +54,7 @@ int main(int argc, char ** argv){
     sleep(1);
     //printClaimMatrix();
 
-
+    printf("oss done\n");
     bail();
     return 0;
 }
@@ -142,6 +142,7 @@ PCB * createProcess() {
         shm_data->local_pid++;
 
         snprintf(indBuf, sizeof(indBuf), "%d", pcbIndex);
+        //printf("indbuf = %s ", indBuf);
 
         execl(CHILD_PROGRAM, CHILD_PROGRAM, indBuf, NULL);
         if (execl(CHILD_PROGRAM, CHILD_PROGRAM, indBuf, NULL) < 0) {

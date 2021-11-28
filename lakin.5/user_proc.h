@@ -7,7 +7,7 @@
 #include "queue.h"
 
 static int id;
-PCB * pcb;
+
 
 void uprocInitialize();
 void attachSharedMemory();

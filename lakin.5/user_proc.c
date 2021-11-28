@@ -24,35 +24,37 @@ const char * perror_arg1 = "user_proc";
 void attachSharedMemory();
 
 char strbuf[20];
-
+PCB * pcb;
 
 int main (int argc, char ** argv){
-    printf("In user_proc\n");
+    printf("In user_proc %s\n", argv[1]);
 
-    id = atoi(argv[2]);
-    pcb = &shm_data->ptab.pcb[id];
-
+    id = atoi(argv[1]);
+    //pcb = &shm_data->ptab.pcb[id];
+    //printf("pcb local pid: %i\n", pcb->local_pid);
+    printf("id= %i ", id);
     uprocInitialize();
     attachSharedMemory();
     printf("\nbefore request\n");
     requestResources();
     printf("\nafter request\n");
 
-
-    exit(0);
+    sem_unlink(SEM_NAME);
+    return 0;
 }
 
 void requestResources() {
   printf("\nin request\n");
   int i;
   for (i = 0; i < RESOURCES; i ++) {
-    request[i] = pcb->rsrcsNeeded[i];
+    request[i] = shm_data->ptab.pcb[id].rsrcsNeeded[i];
+    printf("%02d ", request[i]);
   }
   printf("\nbefore request print\n");
   printf("\nresources requested:\n");
-  for (i = 0; i < RESOURCES; i++) {
-    printf("%02d ", request[i]);
-  }
+  // for (i = 0; i < RESOURCES; i++) {
+  //   printf("%02d ", request[i]);
+  // }
   printf("\nend of request\n");
 }
 
