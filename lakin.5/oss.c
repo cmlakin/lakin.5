@@ -273,12 +273,12 @@ void doSigHandler(int sig) {
 }
 
 void bail() {
-    kill(0, SIGTERM);
     deinitSharedMemory();
-    sem_unlink(SEM_NAME);
+    printf("makes it here\n");
     if (sem_unlink(SEM_NAME) < 0) {
       perror("sem_unlink(3) failed\n");
     }
+    kill(0, SIGTERM);
     exit(0);
 }
 

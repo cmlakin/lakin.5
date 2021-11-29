@@ -36,11 +36,11 @@ int main (int argc, char ** argv){
     printf("id= %i ", id);
     uprocInitialize();
     attachSharedMemory();
-    printf("\nbefore request\n");
+    //printf("\nbefore request\n");
     requestResources();
-    printf("\nafter request\n");
+    //printf("\nafter request\n");
 
-    sem_unlink(SEM_NAME);
+    //sem_unlink(SEM_NAME);
     return 0;
 }
 
@@ -53,12 +53,12 @@ void requestResources() {
   }
   printf("\nbefore request print\n");
   printf("\nresources requested:\n");
-  // for (i = 0; i < RESOURCES; i++) {
-  //   printf("%02d ", request[i]);
-  // }
+  for (i = 0; i < RESOURCES; i++) {
+    printf("%02d ", shm_data->ptab.pcb[id].request[i]);
+  }
   printf("\nend of request\n");
   printf("id = %i\n", id);
-  checkRequest(id);
+  //checkRequest(id);
 }
 
 void releaseResources() {
