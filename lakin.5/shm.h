@@ -16,6 +16,7 @@ typedef struct proc_ctrl_blck {
 	int pid;
 	int local_pid;
 	int rsrcsNeeded[20]; // fill randomly
+	int request[20];
 } PCB;
 
 typedef struct proc_table {

@@ -14,10 +14,10 @@ oss: oss.o queue.o osclock.o shm.o resource.o deadlock.o
 oss.o: oss.c oss.h config.h osclock.h
 	$(GCC) $(CFLAGS) -c oss.c
 
-user_proc: user_proc.o
-	$(GCC)  $(CFLAGS) user_proc.o -o user_proc
+user_proc: user_proc.o deadlock.o
+	$(GCC)  $(CFLAGS) user_proc.o deadlock.o -o user_proc
 
-user_proc.o: user_proc.c
+user_proc.o: user_proc.c user_proc.h
 	$(GCC) $(CFLAGS) -c user_proc.c
 
 osclock.o: osclock.c osclock.h shm.h

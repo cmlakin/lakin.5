@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "config.h"
+#include "config.h"
 #include "shm.h"
 //#include "oss.h"
 #include "user_proc.h"

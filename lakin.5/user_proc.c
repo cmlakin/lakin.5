@@ -1,6 +1,7 @@
 #include "user_proc.h"
 #include "config.h"
 #include "shm.h"
+#include "deadlock.h"
 
 
 /***
@@ -47,8 +48,8 @@ void requestResources() {
   printf("\nin request\n");
   int i;
   for (i = 0; i < RESOURCES; i ++) {
-    request[i] = shm_data->r_state.work[id][i];
-    printf("%02d ", request[i]);
+    shm_data->ptab.pcb[id].request[i] = shm_data->r_state.work[id][i];
+    printf("%02d ", shm_data->ptab.pcb[id].request[i]);
   }
   printf("\nbefore request print\n");
   printf("\nresources requested:\n");
@@ -56,6 +57,7 @@ void requestResources() {
   //   printf("%02d ", request[i]);
   // }
   printf("\nend of request\n");
+  printf("id = %i\n", id);
   checkRequest(id);
 }
 
