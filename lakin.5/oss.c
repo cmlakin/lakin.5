@@ -19,6 +19,7 @@
 #include "queue.h"
 #include "resource.h"
 #include "deadlock.h"
+#include "logger.h"
 
 /***
 	- allocate shm for data structures
@@ -57,9 +58,9 @@ int main(int argc, char ** argv){
     // printClaimMatrix();
     // sleep(1);
     //printf("end of oss main\n");
-    printAllocMatrix();
-    sleep(1);
-    printWorkMatrix();
+    // printAllocMatrix();
+    // sleep(1);
+    // printWorkMatrix();
 
     printf("oss done\n");
     bail();
@@ -149,10 +150,6 @@ PCB * createProcess() {
 
     checkRequest(pcbIndex);
     workMatrix();
-    // printf("in createProcess main\n");
-    // printAllocMatrix();
-    // sleep(1);
-    // printWorkMatrix();
 
     osclock.add(0,1);
     return pcb;
@@ -238,19 +235,19 @@ void updateClock(int sec, int nano) {
     //printf("updateClock: %i:%i\n", osclock.seconds(), osclock.nanoseconds());
 }
 
-void logger(const char * string_buf) {
-    int fid;
-    fid = open(LOG_FILENAME, O_RDWR | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
-
-    if (fid == -1) {
-        snprintf(perror_buf, sizeof(perror_buf), "%s: open: ", perror_arg0);
-        perror(perror_buf);
-    } else {
-        //printf("%s", string_buf);
-        write(fid, (void *) string_buf, strlen(string_buf));
-        close(fid);
-    }
-}
+// void logger(const char * string_buf) {
+//     int fid;
+//     fid = open(LOG_FILENAME, O_RDWR | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
+//
+//     if (fid == -1) {
+//         snprintf(perror_buf, sizeof(perror_buf), "%s: open: ", perror_arg0);
+//         perror(perror_buf);
+//     } else {
+//         //printf("%s", string_buf);
+//         write(fid, (void *) string_buf, strlen(string_buf));
+//         close(fid);
+//     }
+// }
 
 void deinitSharedMemory() {
     if (shmdt(shm_data) == -1) {

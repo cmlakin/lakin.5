@@ -3,6 +3,7 @@
 //#include "osclock.h"
 #include "resource.h"
 #include "deadlock.h"
+#include "logger.h"
 
 void checkRequest(int id) {
   shm_data = shmAttach();
@@ -37,9 +38,9 @@ void checkRequest(int id) {
     }
     else { // simulate allocation
 
-      // snprintf(logbuf, sizeof(logbuf),
-      //         "Master running deadlock detection at time %0d:%09d:\n", osclock.seconds(), osclock.nanoseconds());
-      // logger(logbuf);
+      snprintf(logbuf, sizeof(logbuf),
+              "Master running deadlock detection at time %0d:%09d:\n", osclock.seconds(), osclock.nanoseconds());
+      logger(logbuf);
       // check for safe state
       //if (safe (newstate)) {
 
