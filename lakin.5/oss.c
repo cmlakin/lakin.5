@@ -56,9 +56,10 @@ int main(int argc, char ** argv){
     sleep(1);
     // printClaimMatrix();
     // sleep(1);
-    // printAllocMatrix();
-    // sleep(1);
-    // printWorkMatrix();
+    printf("end of oss main\n");
+    printAllocMatrix();
+    sleep(1);
+    printWorkMatrix();
 
     printf("oss done\n");
     bail();
@@ -119,6 +120,11 @@ PCB * createProcess() {
 
         claimMatrix(pcb, pcbIndex);
 
+        // printf("in create process after claim matrix\n");
+        // printAllocMatrix();
+        // sleep(1);
+        // printWorkMatrix();
+
         shm_data->local_pid++;
 
         snprintf(indBuf, sizeof(indBuf), "%d", pcbIndex);
@@ -128,15 +134,23 @@ PCB * createProcess() {
           exit(EXIT_FAILURE);
         }
     }
-    printf("in oss: requestflag = %i\n", shm_data->requestFlag);
+    //printf("in oss: requestflag = %i\n", shm_data->requestFlag);
     while(shm_data->requestFlag != pcbIndex) {}
-    // snprintf(logbuf, sizeof(logbuf),
-    //         "Master has detected Process with PID %i is requesting  %i at time %0d:%09d\n",
-    //           pcb->local_pid & 0xff, pcb->ptype, osclock.seconds(), osclock.nanoseconds());
-    //
-    // logger(logbuf);
+    //printf( "out of while loop\n");
+
+    snprintf(logbuf, sizeof(logbuf),
+            "Master has detected Process with PID %i is requesting  R%i at time %0d:%09d\n",
+              pcb->local_pid & 0xff, shm_data->ptab.pcb[pcbIndex].resReqIndex, osclock.seconds(), osclock.nanoseconds());
+
+    logger(logbuf);
+
     checkRequest(pcbIndex);
-    printf( "out of while loop\n");
+    workMatrix();
+    // printf("in createProcess main\n");
+    // printAllocMatrix();
+    // sleep(1);
+    // printWorkMatrix();
+
     osclock.add(0,1);
     return pcb;
 }

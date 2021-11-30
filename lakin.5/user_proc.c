@@ -1,8 +1,11 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
 #include "user_proc.h"
 #include "config.h"
 #include "shm.h"
 #include "deadlock.h"
-
 
 /***
 	-request resource
@@ -44,30 +47,39 @@ int main (int argc, char ** argv){
 }
 
 void requestResources() {
-  printf("\nin request\n");
+  //printf("\nin request\n");
+  srand(time(0));
+  int randNum = 18; //rand() % RESOURCES + 1;
+  //printf("rand = %i\n", randNum);
 
-  if (sem_post(semaphore) < 0) {
-    perror("sem_post(3) error on child");
-  } else {
-    printf("user_proc sent semaphore\n");
+  while (shm_data->r_state.work[id][randNum] == 0) {
+    if (randNum == RESOURCES) {
+      randNum = 0;
+    }
+    else {
+      randNum++;
+    }
   }
-  printf("in top of user_proc: requestflag = %i\n", shm_data->requestFlag);
-
-  int i;
-  for (i = 0; i < RESOURCES; i ++) {
-    shm_data->ptab.pcb[id].request[i] = shm_data->r_state.work[id][i];
+  //printf("rand = %i\n", randNum);
+  shm_data->ptab.pcb[id].resReqIndex = randNum;
+  if(shm_data->r_state.work[id][randNum] > 0){
+    shm_data->ptab.pcb[id].request[0] = shm_data->r_state.work[id][randNum];
     //printf("%02d ", shm_data->ptab.pcb[id].request[i]);
   }
+
+  printf("request R[%i] = %i\n", randNum, shm_data->ptab.pcb[id].request[0]);
+
+
   // printf("\nbefore request print\n");
   // printf("\nresources requested:\n");
   // for (i = 0; i < RESOURCES; i++) {
   //   printf("%02d ", shm_data->ptab.pcb[id].request[i]);
   // }
-  printf("\nend of request\n");
-  printf("id = %i\n", id);
+  // printf("\nend of request\n");
+  // printf("id = %i\n", id);
   shm_data->requestFlag = id;
-  printf("in user_proc: requestflag = %i\n", shm_data->requestFlag);
-  
+  //printf("in user_proc: requestflag = %i\n", shm_data->requestFlag);
+
 }
 
 void releaseResources() {
