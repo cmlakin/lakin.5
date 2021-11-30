@@ -27,7 +27,7 @@
 #define FTOK_MSG 2
 #define FTOK_BASE "oss.c"
 
-#define SEM_NAME "/try16"
+#define SEM_NAME "/try22"
 #define SEM_PERMS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
 #define INITIAL_VALUE 1
 #define CHILD_PROGRAM "user_proc"
@@ -44,9 +44,8 @@
 #define PT_USE_TIME  0x0008
 #define PT_TERMINATE 0x0010
 
-#define PROB_IO			30		// 30% of the time IO bound
+#define PROB_TERMINATE 3		// 30% of the time terminate if request not granted
 #define PROB_CPU		100		// 70% of the time CPU bound
-#define PROB_TERMINATE 	10		// 5% of the time terminate
 #define PROB_CB_IU	40		// CPU block or IO use all 35%
 #define PROB_IB_CA	100		// IO block or CPU use all 60%
 

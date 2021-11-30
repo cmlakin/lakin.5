@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 #include "config.h"
 
 #ifndef CREATED_STATICS
@@ -57,3 +57,4 @@ int initializeSig();
 void scheduler();
 int findAvailablePcb(void);
 void initializeSemaphore();
+void releaseResources(int);
