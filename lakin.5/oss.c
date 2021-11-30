@@ -147,7 +147,7 @@ PCB * createProcess() {
 
         snprintf(indBuf, sizeof(indBuf), "%d", pcbIndex);
 
-        execl(CHILD_PROGRAM, CHILD_PROGRAM, indBuf, NULL);
+        //execl(CHILD_PROGRAM, CHILD_PROGRAM, indBuf, NULL);
         if (execl(CHILD_PROGRAM, CHILD_PROGRAM, indBuf, NULL) < 0) {
           perror("execl(2) failed\n");
           exit(EXIT_FAILURE);
@@ -165,6 +165,11 @@ PCB * createProcess() {
         // }
 
     } else {
+      printf("in oss: requestflag = %i\n", shm_data->requestFlag);
+      while(shm_data->requestFlag == pcbIndex) {
+        printf( "in while loop\n");
+        exit(0);
+      }
     }
 
     osclock.add(0,1);

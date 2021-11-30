@@ -51,6 +51,7 @@ void requestResources() {
   // } else {
   //   printf("user_proc sent semaphore\n");
   // }
+  printf("in top of user_proc: requestflag = %i\n", shm_data->requestFlag);
 
   int i;
   for (i = 0; i < RESOURCES; i ++) {
@@ -101,17 +102,7 @@ void uprocInitialize(){
 }
 
 void attachSharedMemory() {
-    key_t fkey = ftok(FTOK_BASE, FTOK_SHM);
-
-    shm_id = shmget(fkey, sizeof(struct shared_data), 0666 | IPC_CREAT);
-
-    if(shm_id == -1) {
-        snprintf(perror_buf, sizeof(perror_buf), "%s: shmget: ", perror_arg1);
-        perror(perror_buf);
-        return;
-    }
-
-    shm_data = (struct shared_data*)shmat(shm_id, NULL, 0);
+    shmAttach();
 }
 
 
