@@ -40,12 +40,18 @@ int main (int argc, char ** argv){
     requestResources();
     //printf("\nafter request\n");
 
-    //sem_unlink(SEM_NAME);
     return 0;
 }
 
 void requestResources() {
   printf("\nin request\n");
+
+  // if (sem_post(semaphore) < 0) {
+  //   perror("sem_post(3) error on child");
+  // } else {
+  //   printf("user_proc sent semaphore\n");
+  // }
+
   int i;
   for (i = 0; i < RESOURCES; i ++) {
     shm_data->ptab.pcb[id].request[i] = shm_data->r_state.work[id][i];
@@ -58,6 +64,8 @@ void requestResources() {
   }
   printf("\nend of request\n");
   printf("id = %i\n", id);
+  shm_data->requestFlag = id;
+  printf("in user_proc: requestflag = %i\n", shm_data->requestFlag);
   //checkRequest(id);
 }
 
@@ -66,23 +74,23 @@ void releaseResources() {
 }
 
 void uprocInitialize(){
-  sem_t *semaphore = sem_open(SEM_NAME, O_RDWR);
+  semaphore = sem_open(SEM_NAME, O_RDWR);
 
   if (semaphore == SEM_FAILED) {
     perror("sem_open(3) failed\n");
     exit(EXIT_FAILURE);
   }
 
-  if (sem_wait(semaphore) < 0) {
-    perror("sem_wait(3) failed on child\n");
-    //continue;
-  }
+  // if (sem_wait(semaphore) < 0) {
+  //   perror("sem_wait(3) failed on child\n");
+  //   //continue;
+  // }
 
-  printf("PID %ld aquired semaphore\n", (long) getpid());
-
-  if (sem_post(semaphore) < 0) {
-    perror("sem_post(3) error on child");
-  }
+  //printf("PID %ld aquired semaphore\n", (long) getpid());
+  //
+  // if (sem_post(semaphore) < 0) {
+  //   perror("sem_post(3) error on child");
+  // }
 
   sleep(1);
 

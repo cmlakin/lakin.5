@@ -41,6 +41,7 @@ int main(int argc, char ** argv){
     srand(getpid());
 
     initialize();
+    shm_data->requestFlag = -1;
 
     if (totalProcesses == 0) {
         launchNewProc();
@@ -49,14 +50,14 @@ int main(int argc, char ** argv){
 
     while (totalProcesses < testNum) {
       scheduler();
-      sleep(2);
+      sleep(1);
     }
     sleep(1);
-    printClaimMatrix();
-    sleep(1);
-    printAllocMatrix();
-    sleep(1);
-    printWorkMatrix();
+    // printClaimMatrix();
+    // sleep(1);
+    // printAllocMatrix();
+    // sleep(1);
+    // printWorkMatrix();
 
     printf("oss done\n");
     bail();
@@ -151,7 +152,17 @@ PCB * createProcess() {
           perror("execl(2) failed\n");
           exit(EXIT_FAILURE);
         }
-        // exit(-1);
+
+        printf("in oss: requestflag = %i\n", shm_data->requestFlag);
+        while(shm_data->requestFlag == -1) {
+          printf( "in while loop\n");
+        }
+        // if (sem_wait(semaphore) < 0) {
+        //   perror("sem_wait(3) failed on child\n");
+        //   //continue;
+        // } else {
+        //   printf("oss received semaphore\n");
+        // }
 
     } else {
     }
@@ -172,7 +183,7 @@ void initializeSharedMemory() {
 }
 
 void initializeSemaphore() {
-  sem_t *semaphore = sem_open(SEM_NAME, O_CREAT | O_EXCL, SEM_PERMS, INITIAL_VALUE);
+  semaphore = sem_open(SEM_NAME, O_CREAT | O_EXCL, SEM_PERMS, INITIAL_VALUE);
 
   if (semaphore == SEM_FAILED) {
     perror("sem_open(3) error\n");

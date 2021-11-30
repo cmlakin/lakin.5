@@ -25,7 +25,6 @@ typedef struct proc_table {
 
 // shared memory
 typedef struct shared_data {
-
 	int local_pid; 	// assigned PID
 
 	int launchSec;
@@ -36,7 +35,11 @@ typedef struct shared_data {
 	// process table
 	struct proc_table ptab;
 
+	// resource state
 	struct state r_state;
+
+	// request flag
+	int requestFlag;
 
 	// report stats
 

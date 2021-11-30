@@ -33,6 +33,7 @@ static int activeProcs = 0;
 char logbuf[200];
 char indBuf[2];
 pid_t pid;
+sem_t *semaphore;
 //sem_t semaphore;
 
 void initialize();
