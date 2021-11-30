@@ -7,4 +7,5 @@
 
 
 void checkRequest(int);
+void checkRelease(int);
 //boolean safe (state S);

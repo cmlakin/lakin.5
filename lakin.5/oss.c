@@ -56,7 +56,7 @@ int main(int argc, char ** argv){
     sleep(1);
     // printClaimMatrix();
     // sleep(1);
-    printf("end of oss main\n");
+    //printf("end of oss main\n");
     printAllocMatrix();
     sleep(1);
     printWorkMatrix();
@@ -71,10 +71,12 @@ void scheduler() {
     PCB * foo;
 
     foo = createProcess();
+    int pInd = foo->local_pid & 0xff;
+    printf("pInd = %i\n", pInd);
 
     printf("back in scheduler\n");
 
-
+    releaseResources(pInd);
 
 }
 
@@ -140,7 +142,8 @@ PCB * createProcess() {
 
     snprintf(logbuf, sizeof(logbuf),
             "Master has detected Process with PID %i is requesting  R%i at time %0d:%09d\n",
-              pcb->local_pid & 0xff, shm_data->ptab.pcb[pcbIndex].resReqIndex, osclock.seconds(), osclock.nanoseconds());
+              pcb->local_pid & 0xff, shm_data->ptab.pcb[pcbIndex].resReqIndex,
+              osclock.seconds(), osclock.nanoseconds());
 
     logger(logbuf);
 
@@ -153,6 +156,16 @@ PCB * createProcess() {
 
     osclock.add(0,1);
     return pcb;
+}
+
+void releaseResources(int id) {
+
+  int i;
+  for (i = 0; i < RESOURCES; i++) {
+    shm_data->r_state.available[i] += shm_data->r_state.alloc[id][i];
+    shm_data->r_state.work[id][i] += shm_data->r_state.alloc[id][i];
+    shm_data->r_state.alloc[id][i] = 0;
+  }
 }
 
 void initialize() {
@@ -481,4 +494,58 @@ int initializeSig() {
 //
 //     osclock.add(0,1);
 //     return pcb;
+// }
+
+// void checkRelease(int id) {
+//   //shm_data = shmAttach();
+//   int i;
+//   printf("id = %i\n", id);
+//   printf("current available:\n");
+//   printf("     ");
+//   for (i = 0; i < RESOURCES; i++) {
+//     printf("%02d ",shm_data->r_state.available[i]);
+//   }
+//   // printf("\ncurrent resources needed:\n");
+//   // printf("     ");
+//   // for (i = 0; i < RESOURCES; i++) {
+//   //   printf("%02d ",shm_data->ptab.pcb[id].rsrcsNeeded[i]);
+//   // }
+//   printf("\nalloc resources:\n");
+//   printf("     ");
+//   for (i = 0; i < RESOURCES; i++) {
+//     printf("%02d ",shm_data->r_state.alloc[id][i]);
+//   }
+//   printf("\nwork resources:\n");
+//   printf("     ");
+//   for (i = 0; i < RESOURCES; i++) {
+//     printf("%02d ",shm_data->r_state.work[id][i]);
+//   }
+//   printf("\n");
+//   for (i = 0; i < RESOURCES; i++) {
+//     shm_data->r_state.available[i] += shm_data->r_state.alloc[id][i];
+//     shm_data->r_state.work[id][i] += shm_data->r_state.alloc[id][i];
+//     shm_data->r_state.alloc[id][i] = 0;
+//   }
+//
+//   printf("\nnew available:\n");
+//   printf("     ");
+//   for (i = 0; i < RESOURCES; i++) {
+//     printf("%02d ",shm_data->r_state.available[i]);
+//   }
+//   // printf("\nnew current :\n");
+//   // printf("     ");
+//   // for (i = 0; i < RESOURCES; i++) {
+//   //   printf("%02d ",shm_data->ptab.pcb[id].rsrcsNeeded[i]);
+//   // }
+//   printf("\nnew alloc:\n");
+//   printf("     ");
+//   for (i = 0; i < RESOURCES; i++) {
+//     printf("%02d ",shm_data->r_state.alloc[id][i]);
+//   }
+//   printf("\nnew work:\n");
+//   printf("     ");
+//   for (i = 0; i < RESOURCES; i++) {
+//     printf("%02d ",shm_data->r_state.work[id][i]);
+//   }
+//
 // }
