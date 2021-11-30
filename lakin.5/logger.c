@@ -15,7 +15,7 @@ void logger(const char * string_buf) {
     fid = open(LOG_FILENAME, O_RDWR | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
 
     if (fid == -1) {
-        snprintf(perror_buf, sizeof(perror_buf), "%s: open: ", perror_arg2);
+        snprintf(perror_buf, sizeof(perror_buf), "%s: open: ", perror_arg0);
         perror(perror_buf);
     } else {
         //printf("%s", string_buf);

@@ -1,9 +1,9 @@
 #include "shm.h"
 #include "config.h"
-//#include "osclock.h"
+#include "logger.h"
 #include "resource.h"
 #include "deadlock.h"
-#include "logger.h"
+
 
 void checkRequest(int id) {
   shm_data = shmAttach();
