@@ -47,7 +47,7 @@ state * initializeResources() {
 // add process resources to claim matix
 state * claimMatrix(PCB *pcb, int pcbIndex) {
     int j;
-    printf("\nclaim:");
+    //printf("\nclaim:");
 
     for (j = 0; j < 20; j++){
       //printf("resource needed: %02d ", pcb->rsrcsNeeded[j]);
@@ -55,12 +55,13 @@ state * claimMatrix(PCB *pcb, int pcbIndex) {
       shm_data->r_state.claim[pcbIndex][j] = pcb->rsrcsNeeded[j];
       //printf(" %02d ", shm_data->r_state.claim[pcbIndex][j]);
     }
+    allocMatrix();
 }
 
 // initialize allocated values when process is added to claim matrix
 state * allocMatrix() {
   int i, j;
-  printf("\nin alloc\n");
+  //printf("\nin alloc\n");
 
    for (i = 0; i < testNum; i++) {
      for (j = 0; j < 20; j++) {
@@ -76,13 +77,14 @@ state * allocMatrix() {
      }
    }
    //printAllocMatrix();
-   printf("alloc done\n");
+   //printf("alloc done\n");
+   workMatrix();
 }
 
 // initialize work matrix (claim - alloc)
 state * workMatrix(){
   int i, j;
-  printf("\nin work\n");
+  //printf("\nin work\n");
 
   for (i = 0; i < testNum; i++) {
     for (j = 0; j < RESOURCES; j++) {
@@ -99,7 +101,7 @@ state * workMatrix(){
       }
     }
   }
-  printf("work done\n");
+  //printf("work done\n");
 }
 
 // print claim matrix

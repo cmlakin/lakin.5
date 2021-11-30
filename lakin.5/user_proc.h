@@ -7,6 +7,7 @@
 #include "queue.h"
 
 static int id;
+sem_t *semaphore;
 
 
 void uprocInitialize();

@@ -1,7 +1,11 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
 #include "user_proc.h"
 #include "config.h"
 #include "shm.h"
-
+#include "deadlock.h"
 
 /***
 	-request resource
@@ -35,27 +39,47 @@ int main (int argc, char ** argv){
     printf("id= %i ", id);
     uprocInitialize();
     attachSharedMemory();
-    printf("\nbefore request\n");
+    //printf("\nbefore request\n");
     requestResources();
-    printf("\nafter request\n");
+    //printf("\nafter request\n");
 
-    sem_unlink(SEM_NAME);
-    return 0;
+    //return 0;
 }
 
 void requestResources() {
-  printf("\nin request\n");
-  int i;
-  for (i = 0; i < RESOURCES; i ++) {
-    //request[i] = shm_data->r_state.work[id][i];
-    printf("%02d ", request[i]);
+  //printf("\nin request\n");
+  srand(time(0));
+  int randNum = 18; //rand() % RESOURCES + 1;
+  //printf("rand = %i\n", randNum);
+
+  while (shm_data->r_state.work[id][randNum] == 0) {
+    if (randNum == RESOURCES) {
+      randNum = 0;
+    }
+    else {
+      randNum++;
+    }
   }
-  printf("\nbefore request print\n");
-  printf("\nresources requested:\n");
+  //printf("rand = %i\n", randNum);
+  shm_data->ptab.pcb[id].resReqIndex = randNum;
+  if(shm_data->r_state.work[id][randNum] > 0){
+    shm_data->ptab.pcb[id].request[0] = shm_data->r_state.work[id][randNum];
+    //printf("%02d ", shm_data->ptab.pcb[id].request[i]);
+  }
+
+  printf("request R[%i] = %i\n", randNum, shm_data->ptab.pcb[id].request[0]);
+
+
+  // printf("\nbefore request print\n");
+  // printf("\nresources requested:\n");
   // for (i = 0; i < RESOURCES; i++) {
-  //   printf("%02d ", request[i]);
+  //   printf("%02d ", shm_data->ptab.pcb[id].request[i]);
   // }
-  printf("\nend of request\n");
+  // printf("\nend of request\n");
+  // printf("id = %i\n", id);
+  shm_data->requestFlag = id;
+  //printf("in user_proc: requestflag = %i\n", shm_data->requestFlag);
+
 }
 
 void releaseResources() {
@@ -63,44 +87,34 @@ void releaseResources() {
 }
 
 void uprocInitialize(){
-  sem_t *semaphore = sem_open(SEM_NAME, O_RDWR);
+  semaphore = sem_open(SEM_NAME, O_RDWR);
 
   if (semaphore == SEM_FAILED) {
     perror("sem_open(3) failed\n");
     exit(EXIT_FAILURE);
   }
 
-  if (sem_wait(semaphore) < 0) {
-    perror("sem_wait(3) failed on child\n");
-    //continue;
-  }
+  // if (sem_wait(semaphore) < 0) {
+  //   perror("sem_wait(3) failed on child\n");
+  //   //continue;
+  // }
 
-  printf("PID %ld aquired semaphore\n", (long) getpid());
+  //printf("PID %ld aquired semaphore\n", (long) getpid());
+  //
+  // if (sem_post(semaphore) < 0) {
+  //   perror("sem_post(3) error on child");
+  // }
 
-  if (sem_post(semaphore) < 0) {
-    perror("sem_post(3) error on child");
-  }
-
-  sleep(1);
-
-  if (sem_close(semaphore) < 0) {
-    perror("sem_close(3) failed\n");
-  }
+  // sleep(1);
+  //
+  // if (sem_close(semaphore) < 0) {
+  //   perror("sem_close(3) failed\n");
+  // }
 
 }
 
 void attachSharedMemory() {
-    key_t fkey = ftok(FTOK_BASE, FTOK_SHM);
-
-    shm_id = shmget(fkey, sizeof(struct shared_data), 0666 | IPC_CREAT);
-
-    if(shm_id == -1) {
-        snprintf(perror_buf, sizeof(perror_buf), "%s: shmget: ", perror_arg1);
-        perror(perror_buf);
-        return;
-    }
-
-    shm_data = (struct shared_data*)shmat(shm_id, NULL, 0);
+  shm_data = shmAttach();
 }
 
 
