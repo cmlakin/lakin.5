@@ -1,3 +1,4 @@
+#pragma once 
 #include "config.h"
 
 #ifndef CREATED_STATICS

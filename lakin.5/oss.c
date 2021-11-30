@@ -18,6 +18,7 @@
 #include "oss.h"
 #include "queue.h"
 #include "resource.h"
+#include "deadlock.h"
 
 /***
 	- allocate shm for data structures
@@ -70,6 +71,10 @@ void scheduler() {
 
     foo = createProcess();
 
+    printf("back in scheduler\n");
+
+
+
 }
 
 PCB * createProcess() {
@@ -100,18 +105,6 @@ PCB * createProcess() {
         //char strbuf[16];
 
         pcb->local_pid = shm_data->local_pid << 8 | pcbIndex;
-
-        //printf("oss: local_pid %d\n",  pcb->local_pid & 0xff);
-        //snprintf(strbuf, sizeof(strbuf), "%d", pcb->local_pid & 0xff);
-        //printf("\nin create process\n");
-        // int i;
-        // for (i = 0; i < 20; i++) {
-    		// 		printf("R%02d ", i);
-    		// }
-    		// printf("\n");
-    		// for (i = 0; i < 20; i++) {
-    		// 	   printf(" %02d ", shm_data->r_state.resource[i]);
-    		// }
         srand(time(0));
         int i;
         int max = 0;
@@ -124,54 +117,26 @@ PCB * createProcess() {
              //printf("RN%02d = %02d ", i, pcb->rsrcsNeeded[i]);
         }
 
-        // for (i = 0; i < RESOURCES; i++) {
-        //     printf("R%02d ", i);
-        // }
-        // printf("\n");
-        // for (i = 0; i < RESOURCES; i++) {
-        //      printf(" %02d ", pcb->rsrcsNeeded[i]);
-        // }
-
         claimMatrix(pcb, pcbIndex);
-        printf("after claim matrix\n");
-
-
-       // osclock.add(0,1);
-        // // snprintf(logbuf, sizeof(logbuf),
-        // //     "OSS: Generating process with PID %i and putting it in queue %i at time %0d:%09d\n",
-        // //     pcb->local_pid & 0xff, pcb->ptype, osclock.seconds(), osclock.nanoseconds());
-        //
-        // //logger(logbuf);
 
         shm_data->local_pid++;
 
         snprintf(indBuf, sizeof(indBuf), "%d", pcbIndex);
 
-        //execl(CHILD_PROGRAM, CHILD_PROGRAM, indBuf, NULL);
         if (execl(CHILD_PROGRAM, CHILD_PROGRAM, indBuf, NULL) < 0) {
           perror("execl(2) failed\n");
           exit(EXIT_FAILURE);
         }
-
-        printf("in oss: requestflag = %i\n", shm_data->requestFlag);
-        while(shm_data->requestFlag == -1) {
-          printf( "in while loop\n");
-        }
-        // if (sem_wait(semaphore) < 0) {
-        //   perror("sem_wait(3) failed on child\n");
-        //   //continue;
-        // } else {
-        //   printf("oss received semaphore\n");
-        // }
-
-    } else {
-      printf("in oss: requestflag = %i\n", shm_data->requestFlag);
-      while(shm_data->requestFlag == pcbIndex) {
-        printf( "in while loop\n");
-        exit(0);
-      }
     }
-
+    printf("in oss: requestflag = %i\n", shm_data->requestFlag);
+    while(shm_data->requestFlag != pcbIndex) {}
+    // snprintf(logbuf, sizeof(logbuf),
+    //         "Master has detected Process with PID %i is requesting  %i at time %0d:%09d\n",
+    //           pcb->local_pid & 0xff, pcb->ptype, osclock.seconds(), osclock.nanoseconds());
+    //
+    // logger(logbuf);
+    checkRequest(pcbIndex);
+    printf( "out of while loop\n");
     osclock.add(0,1);
     return pcb;
 }
@@ -195,11 +160,11 @@ void initializeSemaphore() {
     exit(EXIT_FAILURE);
   }
 
-  if (sem_close(semaphore) < 0) {
-    perror("sem_close(3) failed\n");
-    sem_unlink(SEM_NAME);
-    exit(EXIT_FAILURE);
-  }
+  // if (sem_close(semaphore) < 0) {
+  //   perror("sem_close(3) failed\n");
+  //   sem_unlink(SEM_NAME);
+  //   exit(EXIT_FAILURE);
+  // }
 }
 
 int findAvailablePcb(void) {
@@ -290,7 +255,6 @@ void doSigHandler(int sig) {
 
 void bail() {
     deinitSharedMemory();
-    printf("makes it here\n");
     if (sem_unlink(SEM_NAME) < 0) {
       perror("sem_unlink(3) failed\n");
     }

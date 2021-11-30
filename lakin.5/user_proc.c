@@ -40,34 +40,34 @@ int main (int argc, char ** argv){
     requestResources();
     //printf("\nafter request\n");
 
-    return 0;
+    //return 0;
 }
 
 void requestResources() {
   printf("\nin request\n");
 
-  // if (sem_post(semaphore) < 0) {
-  //   perror("sem_post(3) error on child");
-  // } else {
-  //   printf("user_proc sent semaphore\n");
-  // }
+  if (sem_post(semaphore) < 0) {
+    perror("sem_post(3) error on child");
+  } else {
+    printf("user_proc sent semaphore\n");
+  }
   printf("in top of user_proc: requestflag = %i\n", shm_data->requestFlag);
 
   int i;
   for (i = 0; i < RESOURCES; i ++) {
     shm_data->ptab.pcb[id].request[i] = shm_data->r_state.work[id][i];
-    printf("%02d ", shm_data->ptab.pcb[id].request[i]);
+    //printf("%02d ", shm_data->ptab.pcb[id].request[i]);
   }
-  printf("\nbefore request print\n");
-  printf("\nresources requested:\n");
-  for (i = 0; i < RESOURCES; i++) {
-    printf("%02d ", shm_data->ptab.pcb[id].request[i]);
-  }
+  // printf("\nbefore request print\n");
+  // printf("\nresources requested:\n");
+  // for (i = 0; i < RESOURCES; i++) {
+  //   printf("%02d ", shm_data->ptab.pcb[id].request[i]);
+  // }
   printf("\nend of request\n");
   printf("id = %i\n", id);
   shm_data->requestFlag = id;
   printf("in user_proc: requestflag = %i\n", shm_data->requestFlag);
-  //checkRequest(id);
+  
 }
 
 void releaseResources() {
@@ -93,16 +93,16 @@ void uprocInitialize(){
   //   perror("sem_post(3) error on child");
   // }
 
-  sleep(1);
-
-  if (sem_close(semaphore) < 0) {
-    perror("sem_close(3) failed\n");
-  }
+  // sleep(1);
+  //
+  // if (sem_close(semaphore) < 0) {
+  //   perror("sem_close(3) failed\n");
+  // }
 
 }
 
 void attachSharedMemory() {
-    shmAttach();
+  shm_data = shmAttach();
 }
 
 
