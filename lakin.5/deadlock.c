@@ -106,23 +106,38 @@ void checkRequest(int id) {
 //
 // }
 
-// boolean safe (state S) {
-// int currentavail[m];
-// // not sure exactly what the statement below does.
-// //process rest[<number of processes>]; // list of processes running currentavail = available;
-// rest = {all processes};
-// possible = true;
-// while (possible) {
-//       //find a process Pk in rest such that
-//       claim[k,*] - alloc[k,*] <= currentavail;
-//       if (found) {        // simulate execution of Pk
-//          currentavail = currentavail + alloc[k,*];
-//          rest = rest - {Pk};
-//        } else
-//          possible = false;
-//        }
-//    return (rest == null);
-// }
+boolean safe (state S) {
+  int currentavail[20];
+  int rest[18];
+  int i, j, k;
+  for (i = 0; i < RESOURCES; i++) {
+    currentavail[i] = shm_data->r_state.available[i];
+  }
+  // not sure exactly what the statement below does.
+  //process rest[<number of processes>]; // list of processes running currentavail = available;
+  for (i = 0; i < PROCESSES; i++) {
+    rest[i] = shm_data->ptab.pcb[i].local_pid; // ??? not sure if this is right
+  }
+
+  possible = true;
+  while (possible) {
+
+    for (j = 0; j < RESOURCES; j++) {
+      k = rest[j];
+      //find a process Pk in rest such that
+      claim[k,j] - alloc[k,j] <= currentavail[j];
+      if (found) {        // simulate execution of Pk
+         currentavail[j] = currentavail[j] + alloc[k,j];
+         // not sure what to do with the line below
+         rest[j] = rest[j] - rest[k];
+       } else {
+         possible = false;
+       }
+
+    }
+    return (rest == null);
+  }
+}
 
 void procTerminate(int id){
   int pInd = id;
