@@ -44,42 +44,42 @@ void checkRequest(int id) {
       logger(logbuf);
       shm_data->numDlckRun++;
       shm_data->grantNow++;
-      // check for safe state
-      // if (safe (newstate)) {
-      //
-      //   snprintf(logbuf, sizeof(logbuf), "\tSafe state after granting request\n");
-      //   logger(logbuf);
-      //   //< carry out allocation >;
-      //   printf("request granted\n");
-      //   snprintf(logbuf, sizeof(logbuf), "\tMaster granting P%i request R%i at time %0d:%09d\n",
-      //             pInd, rInd, osclock.seconds(), osclock.nanoseconds());
-      //   logger(logbuf);
-      //
-      //   //grant request resources
-      //   shm_data->r_state.alloc[pInd][rInd] = shm_data->r_state.alloc[pInd][rInd] + shm_data->ptab.pcb[pInd].request[0];
-      //   //update available resources
-      //   shm_data->r_state.available[rInd] = shm_data->r_state.available[rInd] - shm_data->ptab.pcb[pInd].request[0];
-      // }
-      // else {
-      //   snprintf(logbuf, sizeof(logbuf), "\tUnsafe state after granting request; request not granted\n");
-      //   logger(logbuf);
-      //
-      //   //< restore original state >;
-      //   // request of resources not granted
-      //   shm_data->r_state.alloc[pInd][rInd] = shm_data->r_state.alloc[pInd][rInd] - shm_data->ptab.pcb[pInd].request[0];
-      //   //update available resources
-      //   shm_data->r_state.available[rInd] = shm_data->r_state.available[rInd] + shm_data->ptab.pcb[pInd].request[0];
-      //   //< suspend process i>;
-      //         // put process in wait queue_priority
-      //       if (termChance > PROB_TERMINATE) {
-      //         printf("put process in wait queue\n");
-      //         shm_data->grantWait++;
-      //       }
-      //       else {
-      //       shm_data->procTbyDlck++;
-      //         procTerminate(pInd);
-      //       }
-      // }
+      check for safe state
+      if (safe (newstate)) {
+
+        snprintf(logbuf, sizeof(logbuf), "\tSafe state after granting request\n");
+        logger(logbuf);
+        //< carry out allocation >;
+        printf("request granted\n");
+        snprintf(logbuf, sizeof(logbuf), "\tMaster granting P%i request R%i at time %0d:%09d\n",
+                  pInd, rInd, osclock.seconds(), osclock.nanoseconds());
+        logger(logbuf);
+
+        //grant request resources
+        shm_data->r_state.alloc[pInd][rInd] = shm_data->r_state.alloc[pInd][rInd] + shm_data->ptab.pcb[pInd].request[0];
+        //update available resources
+        shm_data->r_state.available[rInd] = shm_data->r_state.available[rInd] - shm_data->ptab.pcb[pInd].request[0];
+      }
+      else {
+        snprintf(logbuf, sizeof(logbuf), "\tUnsafe state after granting request; request not granted\n");
+        logger(logbuf);
+
+        //< restore original state >;
+        // request of resources not granted
+        shm_data->r_state.alloc[pInd][rInd] = shm_data->r_state.alloc[pInd][rInd] - shm_data->ptab.pcb[pInd].request[0];
+        //update available resources
+        shm_data->r_state.available[rInd] = shm_data->r_state.available[rInd] + shm_data->ptab.pcb[pInd].request[0];
+        //< suspend process i>;
+              // put process in wait queue_priority
+            if (termChance > PROB_TERMINATE) {
+              printf("put process in wait queue\n");
+              shm_data->grantWait++;
+            }
+            else {
+            shm_data->procTbyDlck++;
+              procTerminate(pInd);
+            }
+      }
 
 
     }
@@ -105,37 +105,44 @@ void checkRequest(int id) {
 //   }
 //
 // }
-
+// create an array to store index value of processes that cause deadlock
 boolean safe (state S) {
   int currentavail[20];
   int rest[18];
-  int i, j, k;
+  int k, r;
+  int procCount = activeProcs;
   for (i = 0; i < RESOURCES; i++) {
     currentavail[i] = shm_data->r_state.available[i];
   }
   // not sure exactly what the statement below does.
   //process rest[<number of processes>]; // list of processes running currentavail = available;
-  for (i = 0; i < PROCESSES; i++) {
+  for (i = 0; i < activeProcs; i++) {
     rest[i] = shm_data->ptab.pcb[i].local_pid; // ??? not sure if this is right
   }
 
-  possible = true;
+  int possible = 1;
   while (possible) {
 
-    for (j = 0; j < RESOURCES; j++) {
-      k = rest[j];
-      //find a process Pk in rest such that
-      claim[k,j] - alloc[k,j] <= currentavail[j];
-      if (found) {        // simulate execution of Pk
-         currentavail[j] = currentavail[j] + alloc[k,j];
-         // not sure what to do with the line below
-         rest[j] = rest[j] - rest[k];
-       } else {
-         possible = false;
-       }
+    for (k = 0; k < activeProcs; k++) {
+      possible = 1;
+      for (r = 0; r < RESOURCES; r++) {
+        //find a process Pk in rest such that
+        int canGet = shm_data->r_state.work[k,r] <= currentavail[j];
+        if (canGet) {        // simulate execution of Pk
+           currentavail[r] = currentavail[r] + alloc[k,r];
+           // not sure what to do with the line below
 
+         } else {
+           possible = 0;
+           // add process index to array
+         }
+
+      }
+      if (possible == 1) {
+        procCount--;
+      }
     }
-    return (rest == null);
+    return (procCount == 0);
   }
 }
 
