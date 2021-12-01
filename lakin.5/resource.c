@@ -11,6 +11,7 @@ state * initializeResources() {
     // initialize all arrays and matrixs with 0's
     for (i = 0; i < PROCESSES; i++){
       shm_data->r_state.resource[i] = shm_data->r_state.available[i] = 0;
+      shm_data->rsrcTotals[i] = 0;
       for (j = 0; j < RESOURCES; j++) {
         shm_data->r_state.claim[i][j] = 0;
         shm_data->r_state.alloc[i][j] = 0;
@@ -19,30 +20,11 @@ state * initializeResources() {
     }
 
     // assign system resource values and set initial available values.
+    // and resource counter array for allocation
     for (i = 0; i < RESOURCES; i++) {
       shm_data->r_state.resource[i] = shm_data->r_state.available[i] = rand() % MAX + 1;
+      shm_data->rsrcTotals[i] = shm_data->r_state.resource[i];
     }
-    // print system resources
-    // printf("\nSystem Resources:\n");
-    // for (i = 0; i < RESOURCES; i++) {
-    //     printf("R%02d ", i);
-    // }
-    // printf("\n");
-    // for (i = 0; i < RESOURCES; i++) {
-    //      printf(" %02d ", shm_data->r_state.resource[i]);
-    // }
-    //
-    // // print available resources
-    // printf("\nAvailable Resources:\n");
-    // // print available resources
-    // for (i = 0; i < RESOURCES; i++) {
-    //     printf("R%02d ", i);
-    // }
-    // printf("\n");
-    // for (i = 0; i < RESOURCES; i++) {
-    //      printf(" %02d ", shm_data->r_state.available[i]);
-    // }
-    // printf("\n");
 }
 // add process resources to claim matix
 state * claimMatrix(PCB *pcb, int pcbIndex) {
@@ -60,17 +42,32 @@ state * claimMatrix(PCB *pcb, int pcbIndex) {
 
 // initialize allocated values when process is added to claim matrix
 state * allocMatrix() {
-  int i, j;
-  //printf("\nin alloc\n");
+  int i, j, rMax;
+  //printf("\nin alloc before for loop\n");
+  // for (i = 0; i < testNum; i++) {
+  //   for (j = 0; j < 20; j++) {
+  //     printf("alloc[%i] = %i\n", j, shm_data->r_state.alloc[i][j]);
+  //     printf("rsrcTotals[%i] = %i\n", j, shm_data->rsrcTotals[j]);
+  //     printf("available[%i] = %i\n", j, shm_data->r_state.available[j]);
+  //   }
+  // }
+
 
    for (i = 0; i < testNum; i++) {
+     printf("\nin alloc in for loop\n");
      for (j = 0; j < 20; j++) {
-        if (shm_data->r_state.claim[i][j] > 0) {
+        if (shm_data->rsrcTotals[j] > 0 &&  shm_data->r_state.claim[i][j] > 0) {
+          rMax = shm_data->rsrcTotals[j];
+          shm_data->r_state.alloc[i][j] = rand() % shm_data->r_state.claim[i][j] + 1;
           //printf("claim[%i] = %i ", j, shm_data->r_state.claim[i][j]);
-          shm_data->r_state.alloc[i][j] = rand() % (shm_data->r_state.claim[i][j]) + 1;
-          //printf("alloc[%i] = %i\n", j, shm_data->r_state.alloc[i][j]);
+          shm_data->rsrcTotals[j] -=  shm_data->r_state.alloc[i][j];
+          shm_data->r_state.available[j] -=  shm_data->r_state.alloc[i][j];
+          // printf("alloc[%i] = %i\n", j, shm_data->r_state.alloc[i][j]);
+          // printf("rsrcTotals[%i] = %i\n", j, shm_data->rsrcTotals[j]);
+          // printf("available[%i] = %i\n", j, shm_data->r_state.available[j]);
         }
         else {
+          shm_data->r_state.alloc[i][j] = 0;
           //printf("claim[%i] = %i ", j, shm_data->r_state.claim[i][j]);
           //printf("alloc[%i] = %i\n", j, shm_data->r_state.alloc[i][j]);
         }
