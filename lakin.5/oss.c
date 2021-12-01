@@ -61,6 +61,7 @@ int main(int argc, char ** argv){
     // printAllocMatrix();
     // sleep(1);
     // printWorkMatrix();
+    printStats();
 
     printf("oss done\n");
     bail();
@@ -70,7 +71,11 @@ int main(int argc, char ** argv){
 /** maybe reuse **/
 void scheduler() {
     PCB * foo;
+
     foo = createProcess();
+    int pInd = foo->local_pid & 0xff;
+    printf("pInd = %i\n", pInd);
+
     srand(time(0));
 /*  this code is causing problem after execing into user_proc
     // while (totalProcesses < testNum) {
@@ -90,10 +95,24 @@ void scheduler() {
     //     }
     //   }
 */
-      int chkTerminate = rand() % 250000000 + 1;
 
-      int pInd = foo->local_pid & 0xff;
-      printf("pInd = %i\n", pInd);
+/* tried to implement timer for checking if process should terminate
+      srand(getpid());
+      int randTermNum = 2;//rand() % 10 + 1;
+      int chkTerminate = rand() % 5;
+      startTime = time(NULL);
+      printf("before while\n");
+      while (time(NULL) - startTime < chkTerminate) {
+        printf("in while\n");
+        if (randTermNum <= PROB_TERMINATE){
+          printf("will terminate\n");
+          procTerminate(pInd);
+          startTime = time(NULL);
+        }
+        exit(0);
+      }
+*/
+
 
       printf("back in scheduler\n");
 
@@ -126,8 +145,6 @@ PCB * createProcess() {
         perror("Failed to create new process\n");
         return NULL;
     } else if (pid == 0) {
-        //char strbuf[16];
-
         pcb->local_pid = shm_data->local_pid << 8 | pcbIndex;
         srand(time(0));
         int i;
@@ -143,15 +160,9 @@ PCB * createProcess() {
 
         claimMatrix(pcb, pcbIndex);
 
-        // printf("in create process after claim matrix\n");
-        // printAllocMatrix();
-        // sleep(1);
-        // printWorkMatrix();
-
         shm_data->local_pid++;
 
         snprintf(indBuf, sizeof(indBuf), "%d", pcbIndex);
-
         if (execl(CHILD_PROGRAM, CHILD_PROGRAM, indBuf, NULL) < 0) {
           perror("execl(2) failed\n");
           exit(EXIT_FAILURE);
@@ -189,6 +200,25 @@ void initialize() {
     initializeSharedMemory();
     initializeResources();
     initializeSemaphore();
+    initStats();
+}
+
+void initStats() {
+  shm_data->grantNow = 0;
+  shm_data->grantWait = 0;
+  shm_data->procTbyDlck = 0;
+  shm_data->procChoseT = 0;
+  shm_data->numDlckRun = 0;
+  shm_data->avgTbyDlck = 0.0;
+}
+void printStats() {
+  printf("Number of times granted resource immediately: %02d\n", shm_data->grantNow);
+  printf("Number of times granted resource after waiting: %02d\n", shm_data->grantWait);
+  printf("Number of processes terminated by deadlock algorithm: %02d\n", shm_data->procTbyDlck);
+  printf("Number of processes who chose to terminate: %02d\n", shm_data->procChoseT);
+  printf("Number of times deadlock algorithm ran: %02d\n", shm_data->numDlckRun);
+  float avg = shm_data->avgTbyDlck / (float)totalProcesses;
+  printf("Average of processes terminated by deadlock algorithm: %.2f%%\n", avg);
 }
 
 void initializeSharedMemory() {

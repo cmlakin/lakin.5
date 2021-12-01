@@ -9,13 +9,13 @@ void checkRequest(int id) {
   shm_data = shmAttach();
   srand(time(0));
   //int i;
-  int termChance = 2;//rand() % 10 +1;
+  int termChance = rand() % 10 +1;
   int pInd = id;
   int rInd = shm_data->ptab.pcb[pInd].resReqIndex;
-  printf("in checkRequest\n");
-  printf("pInd = %i\n", pInd);
-  printf("rInd = %i\n", rInd);
-  printf("termChance = %i\n", termChance);
+  // printf("in checkRequest\n");
+  // printf("pInd = %i\n", pInd);
+  // printf("rInd = %i\n", rInd);
+  // printf("termChance = %i\n", termChance);
 
   if (shm_data->r_state.alloc[pInd][rInd] > 0) {
     // resource allocation algorithm
@@ -29,6 +29,7 @@ void checkRequest(int id) {
       // put process in wait queue_priority
       if (termChance > PROB_TERMINATE) {
         printf("put process in wait queue\n");
+        shm_data->grantWait++;
       }
       else {
         shm_data->procChoseT++;
@@ -42,6 +43,7 @@ void checkRequest(int id) {
               "\nMaster running deadlock detection at time %0d:%09d:\n", osclock.seconds(), osclock.nanoseconds());
       logger(logbuf);
       shm_data->numDlckRun++;
+      shm_data->grantNow++;
       // check for safe state
       // if (safe (newstate)) {
       //
@@ -71,6 +73,7 @@ void checkRequest(int id) {
       //         // put process in wait queue_priority
       //       if (termChance > PROB_TERMINATE) {
       //         printf("put process in wait queue\n");
+      //         shm_data->grantWait++;
       //       }
       //       else {
       //       shm_data->procTbyDlck++;

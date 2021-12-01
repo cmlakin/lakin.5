@@ -35,7 +35,7 @@ static int activeProcs = 0;
 char indBuf[2];
 pid_t pid;
 sem_t *semaphore;
-//sem_t semaphore;
+time_t startTime;
 
 void initialize();
 void initializeSharedMemory();
@@ -58,3 +58,5 @@ void scheduler();
 int findAvailablePcb(void);
 void initializeSemaphore();
 void releaseResources(int);
+void printStats();
+void initStats();

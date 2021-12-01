@@ -48,7 +48,7 @@ typedef struct shared_data {
 	int procTbyDlck;
 	int procChoseT;
 	int numDlckRun;
-	int avgTbyDlck;
+	float avgTbyDlck;
 
 	// running total of allocated PROCESSES
 	int rsrcTotals[20];
