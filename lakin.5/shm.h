@@ -43,7 +43,15 @@ typedef struct shared_data {
 	int requestFlag;
 
 	// report stats
+	int grantNow;
+	int grantWait;
+	int procTbyDlck;
+	int procChoseT;
+	int numDlckRun;
+	int avgTbyDlck;
 
+	// running total of allocated PROCESSES
+	int rsrcTotals[20];
 
 } shared_data;
 

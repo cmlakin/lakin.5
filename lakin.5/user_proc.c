@@ -39,6 +39,7 @@ int main (int argc, char ** argv){
     printf("id= %i ", id);
     uprocInitialize();
     attachSharedMemory();
+    shm_data->ptab.pcb[id].pid = getpid();
     //printf("\nbefore request\n");
     requestResources();
     //printf("\nafter request\n");

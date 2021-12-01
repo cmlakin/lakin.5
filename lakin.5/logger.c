@@ -7,7 +7,7 @@
 	-output table after every 20 resources granted
 
 	***/
-
+#include "oss.h"
 #include "logger.h"
 
 void logger(const char * string_buf) {
@@ -17,9 +17,8 @@ void logger(const char * string_buf) {
     if (fid == -1) {
         snprintf(perror_buf, sizeof(perror_buf), "%s: open: ", perror_arg0);
         perror(perror_buf);
-    } else {
-        //printf("%s", string_buf);
-        write(fid, (void *) string_buf, strlen(string_buf));
-        close(fid);
     }
+
+    write(fid, (void *) string_buf, strlen(string_buf));
+    close(fid);
 }
