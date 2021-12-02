@@ -30,6 +30,7 @@ typedef struct shared_data {
 
 	int launchSec;
 	int launchNano;
+	int activeProcs;
 	// simulated clock
   osclock_t osclock;
 

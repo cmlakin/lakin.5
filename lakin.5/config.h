@@ -69,7 +69,7 @@ static int testNum = 3;
 
 //static int totProcsCreated = 0;
 static int allocatedProcs = 0;
-static int activeProcs = 0;
+
 
 // #define MSG_SEND_UPROC 1
 // #define MSG_RECV_UPROC MSG_SEND_UPROC

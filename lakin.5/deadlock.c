@@ -94,20 +94,20 @@ bool safe (state S) {
   int currentavail[20];
   int rest[18];
   int i, k, r;
-  int procCount = activeProcs;
+  int procCount = shm_data->activeProcs;
   for (i = 0; i < RESOURCES; i++) {
     currentavail[i] = shm_data->r_state.available[i];
   }
   // not sure exactly what the statement below does.
   //process rest[<number of processes>]; // list of processes running currentavail = available;
-  for (i = 0; i < activeProcs; i++) {
+  for (i = 0; i < shm_data->activeProcs; i++) {
     rest[i] = shm_data->ptab.pcb[i].local_pid; // ??? not sure if this is right
   }
 
   int possible = 1;
   while (possible) {
 
-    for (k = 0; k < activeProcs; k++) {
+    for (k = 0; k < shm_data->activeProcs; k++) {
       possible = 1;
       for (r = 0; r < RESOURCES; r++) {
         //find a process Pk in rest such that

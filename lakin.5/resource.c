@@ -108,12 +108,13 @@ void printClaimMatrix() {
     int i, j;
     printf("\nClaim Matrix:\n");
     printf("    ");
+    printf("claim activeProcs = %i\n", shm_data->activeProcs);
     // print available resources
     for (i = 0; i < RESOURCES; i++) {
         printf("R%02d ", i);
     }
     printf("\n");
-    for (i = 0; i < activeProcs; i++) {
+    for (i = 0; i < shm_data->activeProcs; i++) {
       printf("P%02d ", i);
       for(j = 0; j < RESOURCES; j++) {
         printf(" %02d ", shm_data->r_state.claim[i][j]);
@@ -134,7 +135,7 @@ void printAllocMatrix() {
         printf("R%02d ", i);
     }
     printf("\n");
-    for (i = 0; i < activeProcs; i++) {
+    for (i = 0; i < shm_data->activeProcs; i++) {
       printf("P%02d ", i);
       for(j = 0; j < RESOURCES; j++) {
         printf(" %02d ", shm_data->r_state.alloc[i][j]);
@@ -155,7 +156,7 @@ void printWorkMatrix() {
         printf("R%02d ", i);
     }
     printf("\n");
-    for (i = 0; i < activeProcs; i++) {
+    for (i = 0; i < shm_data->activeProcs; i++) {
       printf("P%02d ", i);
       for(j = 0; j < RESOURCES; j++) {
         printf(" %02d ", shm_data->r_state.work[i][j]);

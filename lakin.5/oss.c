@@ -122,8 +122,8 @@ void scheduler() {
 
 PCB * createProcess() {
     printf("\ncreateProcess\n");
-    activeProcs++;
-    printf("activeProcs = %i\n", activeProcs);
+    shm_data->activeProcs++;
+    printf("activeProcs = %i\n", shm_data->activeProcs);
     totalProcesses++;
 
     PCB *pcb;
