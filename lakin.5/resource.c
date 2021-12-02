@@ -12,6 +12,7 @@ state * initializeResources() {
     for (i = 0; i < PROCESSES; i++){
       shm_data->r_state.resource[i] = shm_data->r_state.available[i] = 0;
       shm_data->rsrcTotals[i] = 0;
+      shm_data->procsDlck[i] = 0;
       for (j = 0; j < RESOURCES; j++) {
         shm_data->r_state.claim[i][j] = 0;
         shm_data->r_state.alloc[i][j] = 0;
