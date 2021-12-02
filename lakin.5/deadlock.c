@@ -66,6 +66,7 @@ void checkRequest(int id) {
         snprintf(logbuf, sizeof(logbuf), "\tUnsafe state after granting request; request not granted\n");
         logger(logbuf);
         printDeadlock();
+        printf("request denied\n");
         //< restore original state >;
         // request of resources not granted
         shm_data->r_state.alloc[pInd][rInd] = shm_data->r_state.alloc[pInd][rInd] - shm_data->ptab.pcb[pInd].request[0];

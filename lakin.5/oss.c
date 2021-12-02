@@ -73,8 +73,8 @@ void scheduler() {
     PCB * foo;
 
     foo = createProcess();
-    int pInd = foo->local_pid & 0xff;
-    printf("pInd = %i\n", pInd);
+    // int pInd = foo->local_pid & 0xff;
+    // printf("pInd = %i\n", pInd);
 
     srand(time(0));
 /*  this code is causing problem after execing into user_proc
