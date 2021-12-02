@@ -9,16 +9,16 @@ state * initializeResources() {
 
     int i, j;
     // initialize all arrays and matrixs with 0's
-    for (i = 0; i < PROCESSES; i++){
-      shm_data->r_state.resource[i] = shm_data->r_state.available[i] = 0;
-      shm_data->rsrcTotals[i] = 0;
-      shm_data->procsDlck[i] = 0;
-      for (j = 0; j < RESOURCES; j++) {
-        shm_data->r_state.claim[i][j] = 0;
-        shm_data->r_state.alloc[i][j] = 0;
-        //shm_data->r_state.work[i][j] = 0;
-      }
-    }
+    // for (i = 0; i < PROCESSES; i++){
+    //   shm_data->r_state.resource[i] = shm_data->r_state.available[i] = 0;
+    //   shm_data->rsrcTotals[i] = 0;
+    //   shm_data->procsDlck[i] = 0;
+    //   for (j = 0; j < RESOURCES; j++) {
+    //     shm_data->r_state.claim[i][j] = 0;
+    //     shm_data->r_state.alloc[i][j] = 0;
+    //     //shm_data->r_state.work[i][j] = 0;
+    //   }
+    // }
 
     // assign system resource values and set initial available values.
     // and resource counter array for allocation
@@ -45,7 +45,7 @@ state * claimMatrix(PCB *pcb, int pcbIndex) {
 state * allocMatrix(int pcbIndex) {
   int j, rMax;
   int id = pcbIndex;
-  //printf("\nin alloc before for loop\n");
+  printf("\nin alloc before for loop\n");
   // for (i = 0; i < testNum; i++) {
   //   for (j = 0; j < 20; j++) {
   //     printf("alloc[%i] = %i\n", j, shm_data->r_state.alloc[i][j]);
@@ -64,14 +64,14 @@ state * allocMatrix(int pcbIndex) {
           //printf("claim[%i] = %i ", j, shm_data->r_state.claim[i][j]);
           shm_data->rsrcTotals[j] -=  shm_data->r_state.alloc[id][j];
           shm_data->r_state.available[j] -=  shm_data->r_state.alloc[id][j];
-          // printf("alloc[%i] = %i\n", j, shm_data->r_state.alloc[i][j]);
+          // printf("alloc[%i] = %i\n", j, shm_data->r_state.alloc[id][j]);
           // printf("rsrcTotals[%i] = %i\n", j, shm_data->rsrcTotals[j]);
           // printf("available[%i] = %i\n", j, shm_data->r_state.available[j]);
         }
         else {
           shm_data->r_state.alloc[id][j] = 0;
-          //printf("claim[%i] = %i ", j, shm_data->r_state.claim[i][j]);
-          //printf("alloc[%i] = %i\n", j, shm_data->r_state.alloc[i][j]);
+          // printf("claim[%i] = %i ", j, shm_data->r_state.claim[id][j]);
+          // printf("alloc[%i] = %i\n", j, shm_data->r_state.alloc[id][j]);
         }
      }
    //}
