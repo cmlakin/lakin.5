@@ -73,7 +73,7 @@ void scheduler() {
     PCB * foo;
 
     foo = createProcess();
-    // int pInd = foo->local_pid & 0xff;
+    int pInd = foo->local_pid & 0xff;
     // printf("pInd = %i\n", pInd);
 
     srand(time(0));

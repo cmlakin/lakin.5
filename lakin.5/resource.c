@@ -38,12 +38,13 @@ state * claimMatrix(PCB *pcb, int pcbIndex) {
       shm_data->r_state.claim[pcbIndex][j] = pcb->rsrcsNeeded[j];
       //printf(" %02d ", shm_data->r_state.claim[pcbIndex][j]);
     }
-    allocMatrix();
+    allocMatrix(pcbIndex);
 }
 
 // initialize allocated values when process is added to claim matrix
-state * allocMatrix() {
-  int i, j, rMax;
+state * allocMatrix(int pcbIndex) {
+  int j, rMax;
+  int id = pcbIndex;
   //printf("\nin alloc before for loop\n");
   // for (i = 0; i < testNum; i++) {
   //   for (j = 0; j < 20; j++) {
@@ -54,28 +55,28 @@ state * allocMatrix() {
   // }
 
 
-   for (i = 0; i < testNum; i++) {
-     printf("\nin alloc in for loop\n");
+   //for (i = 0; i < testNum; i++) {
+     //printf("\nin alloc in for loop\n");
      for (j = 0; j < 20; j++) {
-        if (shm_data->rsrcTotals[j] > 0 &&  shm_data->r_state.claim[i][j] > 0) {
+        if (shm_data->rsrcTotals[j] > 0 &&  shm_data->r_state.claim[id][j] > 0) {
           rMax = shm_data->rsrcTotals[j];
-          shm_data->r_state.alloc[i][j] = rand() % shm_data->r_state.claim[i][j] + 1;
+          shm_data->r_state.alloc[id][j] = rand() % shm_data->r_state.claim[id][j] + 1;
           //printf("claim[%i] = %i ", j, shm_data->r_state.claim[i][j]);
-          shm_data->rsrcTotals[j] -=  shm_data->r_state.alloc[i][j];
-          shm_data->r_state.available[j] -=  shm_data->r_state.alloc[i][j];
+          shm_data->rsrcTotals[j] -=  shm_data->r_state.alloc[id][j];
+          shm_data->r_state.available[j] -=  shm_data->r_state.alloc[id][j];
           // printf("alloc[%i] = %i\n", j, shm_data->r_state.alloc[i][j]);
           // printf("rsrcTotals[%i] = %i\n", j, shm_data->rsrcTotals[j]);
           // printf("available[%i] = %i\n", j, shm_data->r_state.available[j]);
         }
         else {
-          shm_data->r_state.alloc[i][j] = 0;
+          shm_data->r_state.alloc[id][j] = 0;
           //printf("claim[%i] = %i ", j, shm_data->r_state.claim[i][j]);
           //printf("alloc[%i] = %i\n", j, shm_data->r_state.alloc[i][j]);
         }
      }
-   }
+   //}
    //printAllocMatrix();
-   //printf("alloc done\n");
+   printf("alloc done for p%i\n", id);
    workMatrix();
 }
 
