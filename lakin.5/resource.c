@@ -45,7 +45,7 @@ state * claimMatrix(PCB *pcb, int pcbIndex) {
 state * allocMatrix(int pcbIndex) {
   int j, rMax;
   int id = pcbIndex;
-  printf("\nin alloc before for loop\n");
+  //printf("\nin alloc before for loop id = %i\n", id);
   // for (i = 0; i < testNum; i++) {
   //   for (j = 0; j < 20; j++) {
   //     printf("alloc[%i] = %i\n", j, shm_data->r_state.alloc[i][j]);
@@ -59,24 +59,30 @@ state * allocMatrix(int pcbIndex) {
      //printf("\nin alloc in for loop\n");
      for (j = 0; j < 20; j++) {
         if (shm_data->rsrcTotals[j] > 0 &&  shm_data->r_state.claim[id][j] > 0) {
-          rMax = shm_data->rsrcTotals[j];
-          shm_data->r_state.alloc[id][j] = rand() % shm_data->r_state.claim[id][j] + 1;
-          //printf("claim[%i] = %i ", j, shm_data->r_state.claim[i][j]);
-          shm_data->rsrcTotals[j] -=  shm_data->r_state.alloc[id][j];
-          shm_data->r_state.available[j] -=  shm_data->r_state.alloc[id][j];
-          // printf("alloc[%i] = %i\n", j, shm_data->r_state.alloc[id][j]);
-          // printf("rsrcTotals[%i] = %i\n", j, shm_data->rsrcTotals[j]);
-          // printf("available[%i] = %i\n", j, shm_data->r_state.available[j]);
+          rMax = rand() % shm_data->r_state.claim[id][j] + 1;
+          if (rMax <= shm_data->r_state.available[j]) {
+            shm_data->r_state.alloc[id][j] = rMax;
+            // printf("claim[%i] = %i ", j, shm_data->r_state.claim[id][j]);
+            shm_data->rsrcTotals[j] -=  shm_data->r_state.alloc[id][j];
+            shm_data->r_state.available[j] -=  shm_data->r_state.alloc[id][j];
+            // printf("alloc[%i] = %i  ", j, shm_data->r_state.alloc[id][j]);
+            // printf("rsrcTotals[%i] = %i  ", j, shm_data->rsrcTotals[j]);
+            // printf("available[%i] = %i\n", j, shm_data->r_state.available[j]);
+          }
+          else {
+            shm_data->r_state.alloc[id][j] = shm_data->r_state.available[j];
+            shm_data->r_state.available[j] = 0;
+          }
         }
         else {
           shm_data->r_state.alloc[id][j] = 0;
-          // printf("claim[%i] = %i ", j, shm_data->r_state.claim[id][j]);
+          // printf("claim[%i] = %i  ", j, shm_data->r_state.claim[id][j]);
           // printf("alloc[%i] = %i\n", j, shm_data->r_state.alloc[id][j]);
         }
      }
    //}
    //printAllocMatrix();
-   printf("alloc done for p%i\n", id);
+   //printf("alloc done for p%i\n", id);
    workMatrix();
 }
 
@@ -85,7 +91,7 @@ state * workMatrix(){
   int i, j;
   //printf("\nin work\n");
 
-  for (i = 0; i < testNum; i++) {
+  for (i = 0; i < shm_data->activeProcs; i++) {
     for (j = 0; j < RESOURCES; j++) {
       if (shm_data->r_state.claim[i][j] > 0) {
         //printf("claim[%i] = %i ", j, shm_data->r_state.claim[i][j]);
@@ -106,9 +112,10 @@ state * workMatrix(){
 // print claim matrix
 void printClaimMatrix() {
     int i, j;
+    //printf("claim activeProcs = %i\n", shm_data->activeProcs);
     printf("\nClaim Matrix:\n");
     printf("    ");
-    printf("claim activeProcs = %i\n", shm_data->activeProcs);
+
     // print available resources
     for (i = 0; i < RESOURCES; i++) {
         printf("R%02d ", i);

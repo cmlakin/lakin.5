@@ -65,7 +65,7 @@ static int totalProcesses = 0;
 static struct shared_data * shm_data = NULL;
 static int MAX = 10; // maximum number of resources
 //static int request[20];
-static int testNum = 3;
+static int testNum = 2;
 
 //static int totProcsCreated = 0;
 static int allocatedProcs = 0;

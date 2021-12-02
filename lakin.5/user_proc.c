@@ -48,10 +48,10 @@ int main (int argc, char ** argv){
 }
 
 void requestResources() {
-  printf("\nuproc in request\n");
+  //printf("\nuproc in request\n");
   srand(time(0));
   int randNum = 18; //rand() % RESOURCES + 1;
-  printf("rand = %i\n", randNum);
+  //printf("rand = %i\n", randNum);
 
   while (shm_data->r_state.work[id][randNum] == 0) {
     if (randNum == RESOURCES) {
@@ -61,7 +61,7 @@ void requestResources() {
       randNum++;
     }
   }
-  printf("rand = %i\n", randNum);
+  //printf("rand = %i\n", randNum);
   shm_data->ptab.pcb[id].resReqIndex = randNum;
   if(shm_data->r_state.work[id][randNum] > 0){
     shm_data->ptab.pcb[id].request[0] = shm_data->r_state.work[id][randNum];

@@ -32,6 +32,7 @@ void checkRequest(int id) {
         shm_data->grantWait++;
       }
       else {
+        printf("proc terminated???\n");
         shm_data->procChoseT++;
         procTerminate(pInd);
       }
@@ -42,7 +43,7 @@ void checkRequest(int id) {
       snprintf(logbuf, sizeof(logbuf),
               "\nMaster running deadlock detection at time %0d:%09d:\n", osclock.seconds(), osclock.nanoseconds());
       logger(logbuf);
-      shm_data->numDlckRun++;
+      shm_data->numDlckRun++; // stat
 
 
       //grant request resources temporarily
@@ -91,6 +92,7 @@ void checkRequest(int id) {
 
 // create an array to store index value of processes that cause deadlock
 bool safe (state S) {
+  //printf("in safe 1\n");
   int currentavail[20];
   int rest[18];
   int i, k, r;
@@ -106,17 +108,20 @@ bool safe (state S) {
 
   int possible = 1;
   while (possible) {
-
+//printf("in safe 2\n");
     for (k = 0; k < shm_data->activeProcs; k++) {
       possible = 1;
       for (r = 0; r < RESOURCES; r++) {
         //find a process Pk in rest such that
-        int canGet = shm_data->r_state.work[k][r] <= currentavail[r];
+        int canGet = shm_data->r_state.claim[k][r] - shm_data->r_state.alloc[k][r] <= currentavail[r];
+        //printf("%i <= %i\n", shm_data->r_state.work[k][r], currentavail[r]);
         if (canGet) {        // simulate execution of Pk
+          //printf("in safe 3\n");
            currentavail[r] = currentavail[r] + shm_data->r_state.alloc[k][r];
            // not sure what to do with the line below
           shm_data->procsDlck[r] = 0;
          } else {
+           //printf("in safe 4\n");
            possible = 0;
            // add process index to array
            shm_data->procsDlck[r] = 1;

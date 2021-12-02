@@ -116,7 +116,7 @@ void scheduler() {
 
       printf("back in scheduler\n");
 
-      releaseResources(pInd);
+      //releaseResources(pInd);
     //}
 }
 
@@ -179,6 +179,17 @@ PCB * createProcess() {
               osclock.seconds(), osclock.nanoseconds());
 
     logger(logbuf);
+    int i;
+    printf("res: ");
+    for (i = 0; i < RESOURCES; i++) {
+      printf(" %02d ", shm_data->r_state.resource[i]);
+    }
+    printf("\n");
+    printf("avl: ");
+    for (i = 0; i < RESOURCES; i++) {
+      printf(" %02d ", shm_data->r_state.available[i]);
+    }
+    printf("\n");
     printClaimMatrix();
     sleep(1);
     printf("end of oss main\n");
@@ -208,6 +219,7 @@ void initialize() {
     initializeResources();
     initializeSemaphore();
     initStats();
+    shm_data->activeProcs = 0;
 }
 
 void initStats() {
