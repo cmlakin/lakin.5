@@ -65,7 +65,7 @@ void checkRequest(int id) {
       else {
         snprintf(logbuf, sizeof(logbuf), "\tUnsafe state after granting request; request not granted\n");
         logger(logbuf);
-
+        printDeadlock();
         //< restore original state >;
         // request of resources not granted
         shm_data->r_state.alloc[pInd][rInd] = shm_data->r_state.alloc[pInd][rInd] - shm_data->ptab.pcb[pInd].request[0];
@@ -73,17 +73,15 @@ void checkRequest(int id) {
         shm_data->r_state.available[rInd] = shm_data->r_state.available[rInd] + shm_data->ptab.pcb[pInd].request[0];
         //< suspend process i>;
               // put process in wait queue_priority
-            if (termChance > PROB_TERMINATE) {
-              printf("put process in wait queue\n");
-              shm_data->grantWait++;
-            }
-            else {
-            shm_data->procTbyDlck++;
-              procTerminate(pInd);
-            }
+        if (termChance > PROB_TERMINATE) {
+          printf("put process in wait queue\n");
+          shm_data->grantWait++;
+        }
+        else {
+        shm_data->procTbyDlck++;
+          procTerminate(pInd);
+        }
       }
-
-
     }
   }
 
@@ -116,11 +114,11 @@ bool safe (state S) {
         if (canGet) {        // simulate execution of Pk
            currentavail[r] = currentavail[r] + shm_data->r_state.alloc[k][r];
            // not sure what to do with the line below
-
+          shm_data->procsDlck[r] = 0;
          } else {
            possible = 0;
            // add process index to array
-           shm_data->procsDlck[r] = rest[i];
+           shm_data->procsDlck[r] = 1;
          }
 
       }
@@ -130,6 +128,21 @@ bool safe (state S) {
     }
     return (procCount == 0);
   }
+}
+
+void printDeadlock() {
+  int i;
+
+  snprintf(logbuf, sizeof(logbuf), "\tProcesses ");
+  logger(logbuf);
+  for(i = 0; i < RESOURCES; i++) {
+    if (shm_data->procsDlck[i] > 0) {
+      snprintf(logbuf, sizeof(logbuf), "P%i,", i);
+      logger(logbuf);
+    }
+  }
+  snprintf(logbuf, sizeof(logbuf), " deadlocked\n");
+  logger(logbuf);
 }
 
 void procTerminate(int id){
@@ -150,4 +163,23 @@ void procTerminate(int id){
   }
   //releaseResources(pInd);
   kill(shm_data->ptab.pcb[pInd].pid, SIGKILL);
+}
+
+void checkRelease(int id) {
+  shm_data = shmAttach();
+  int i;
+  printf("current available:\n");
+  for (i = 0; i < RESOURCES; i++) {
+    printf("%02d ",shm_data->r_state.available[i]);
+  }
+
+  for (i = 0; i < RESOURCES; i++) {
+    shm_data->r_state.available[i] += shm_data->ptab.pcb[id].rsrcsNeeded[i];
+  }
+
+  printf("new available:\n");
+  for (i = 0; i < RESOURCES; i++) {
+    printf("%02d ",shm_data->r_state.available[i]);
+  }
+
 }

@@ -9,4 +9,5 @@
 void checkRequest(int);
 void checkRelease(int);
 void procTerminate(int);
+void printDeadlock(); 
 bool safe (state S);
