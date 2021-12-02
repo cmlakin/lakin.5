@@ -67,6 +67,10 @@ static int MAX = 10; // maximum number of resources
 //static int request[20];
 static int testNum = 3;
 
+//static int totProcsCreated = 0;
+static int allocatedProcs = 0;
+static int activeProcs = 0;
+
 // #define MSG_SEND_UPROC 1
 // #define MSG_RECV_UPROC MSG_SEND_UPROC
 // #define MSG_SEND_OSS 2

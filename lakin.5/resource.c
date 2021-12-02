@@ -8,17 +8,17 @@ state * initializeResources() {
     shm_data = shmAttach();
 
     int i, j;
-    // initialize all arrays and matrixs with 0's
-    // for (i = 0; i < PROCESSES; i++){
-    //   shm_data->r_state.resource[i] = shm_data->r_state.available[i] = 0;
-    //   shm_data->rsrcTotals[i] = 0;
-    //   shm_data->procsDlck[i] = 0;
-    //   for (j = 0; j < RESOURCES; j++) {
-    //     shm_data->r_state.claim[i][j] = 0;
-    //     shm_data->r_state.alloc[i][j] = 0;
-    //     //shm_data->r_state.work[i][j] = 0;
-    //   }
-    // }
+    //initialize all arrays and matrixs with 0's
+    for (i = 0; i < PROCESSES; i++){
+      shm_data->r_state.resource[i] = shm_data->r_state.available[i] = 0;
+      shm_data->rsrcTotals[i] = 0;
+      shm_data->procsDlck[i] = 0;
+      for (j = 0; j < RESOURCES; j++) {
+        shm_data->r_state.claim[i][j] = 0;
+        shm_data->r_state.alloc[i][j] = 0;
+        //shm_data->r_state.work[i][j] = 0;
+      }
+    }
 
     // assign system resource values and set initial available values.
     // and resource counter array for allocation
@@ -113,7 +113,7 @@ void printClaimMatrix() {
         printf("R%02d ", i);
     }
     printf("\n");
-    for (i = 0; i < testNum; i++) {
+    for (i = 0; i < activeProcs; i++) {
       printf("P%02d ", i);
       for(j = 0; j < RESOURCES; j++) {
         printf(" %02d ", shm_data->r_state.claim[i][j]);
@@ -134,7 +134,7 @@ void printAllocMatrix() {
         printf("R%02d ", i);
     }
     printf("\n");
-    for (i = 0; i < testNum; i++) {
+    for (i = 0; i < activeProcs; i++) {
       printf("P%02d ", i);
       for(j = 0; j < RESOURCES; j++) {
         printf(" %02d ", shm_data->r_state.alloc[i][j]);
@@ -155,7 +155,7 @@ void printWorkMatrix() {
         printf("R%02d ", i);
     }
     printf("\n");
-    for (i = 0; i < testNum; i++) {
+    for (i = 0; i < activeProcs; i++) {
       printf("P%02d ", i);
       for(j = 0; j < RESOURCES; j++) {
         printf(" %02d ", shm_data->r_state.work[i][j]);
