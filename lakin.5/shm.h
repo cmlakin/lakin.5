@@ -53,6 +53,9 @@ typedef struct shared_data {
 	// running total of allocated PROCESSES
 	int rsrcTotals[20];
 
+	// processes causing deadlock
+	int procsDlck[18];
+
 } shared_data;
 
 int shmGet();

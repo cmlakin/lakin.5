@@ -43,22 +43,24 @@ void checkRequest(int id) {
               "\nMaster running deadlock detection at time %0d:%09d:\n", osclock.seconds(), osclock.nanoseconds());
       logger(logbuf);
       shm_data->numDlckRun++;
-      shm_data->grantNow++;
-      check for safe state
-      if (safe (newstate)) {
+
+
+      //grant request resources temporarily
+      shm_data->r_state.alloc[pInd][rInd] = shm_data->r_state.alloc[pInd][rInd] + shm_data->ptab.pcb[pInd].request[0];
+      //update available resources temporarily
+      shm_data->r_state.available[rInd] = shm_data->r_state.available[rInd] - shm_data->ptab.pcb[pInd].request[0];
+
+      //check for safe state
+      if (safe (shm_data->r_state)) {
 
         snprintf(logbuf, sizeof(logbuf), "\tSafe state after granting request\n");
         logger(logbuf);
         //< carry out allocation >;
         printf("request granted\n");
+        shm_data->grantNow++;
         snprintf(logbuf, sizeof(logbuf), "\tMaster granting P%i request R%i at time %0d:%09d\n",
                   pInd, rInd, osclock.seconds(), osclock.nanoseconds());
         logger(logbuf);
-
-        //grant request resources
-        shm_data->r_state.alloc[pInd][rInd] = shm_data->r_state.alloc[pInd][rInd] + shm_data->ptab.pcb[pInd].request[0];
-        //update available resources
-        shm_data->r_state.available[rInd] = shm_data->r_state.available[rInd] - shm_data->ptab.pcb[pInd].request[0];
       }
       else {
         snprintf(logbuf, sizeof(logbuf), "\tUnsafe state after granting request; request not granted\n");
@@ -87,29 +89,12 @@ void checkRequest(int id) {
 
 }
 
-// void checkRelease(int id) {
-//   shm_data = shmAttach();
-//   int i;
-//   printf("current available:\n");
-//   for (i = 0; i < RESOURCES; i++) {
-//     printf("%02d ",shm_data->r_state.available[i]);
-//   }
-//
-//   for (i = 0; i < RESOURCES; i++) {
-//     shm_data->r_state.available[i] += shm_data->ptab.pcb[id].rsrcsNeeded[i];
-//   }
-//
-//   printf("new available:\n");
-//   for (i = 0; i < RESOURCES; i++) {
-//     printf("%02d ",shm_data->r_state.available[i]);
-//   }
-//
-// }
+
 // create an array to store index value of processes that cause deadlock
-boolean safe (state S) {
+bool safe (state S) {
   int currentavail[20];
   int rest[18];
-  int k, r;
+  int i, k, r;
   int procCount = activeProcs;
   for (i = 0; i < RESOURCES; i++) {
     currentavail[i] = shm_data->r_state.available[i];
@@ -127,14 +112,15 @@ boolean safe (state S) {
       possible = 1;
       for (r = 0; r < RESOURCES; r++) {
         //find a process Pk in rest such that
-        int canGet = shm_data->r_state.work[k,r] <= currentavail[j];
+        int canGet = shm_data->r_state.work[k][r] <= currentavail[r];
         if (canGet) {        // simulate execution of Pk
-           currentavail[r] = currentavail[r] + alloc[k,r];
+           currentavail[r] = currentavail[r] + shm_data->r_state.alloc[k][r];
            // not sure what to do with the line below
 
          } else {
            possible = 0;
            // add process index to array
+           shm_data->procsDlck[r] = rest[i];
          }
 
       }
