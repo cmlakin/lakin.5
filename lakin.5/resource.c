@@ -16,7 +16,7 @@ state * initializeResources() {
       for (j = 0; j < RESOURCES; j++) {
         shm_data->r_state.claim[i][j] = 0;
         shm_data->r_state.alloc[i][j] = 0;
-        shm_data->r_state.work[i][j] = 0;
+        //shm_data->r_state.work[i][j] = 0;
       }
     }
 

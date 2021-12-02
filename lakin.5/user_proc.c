@@ -36,8 +36,8 @@ int main (int argc, char ** argv){
     id = atoi(argv[1]);
     //pcb = &shm_data->ptab.pcb[id];
     //printf("pcb local pid: %i\n", pcb->local_pid);
-    printf("id= %i ", id);
-    uprocInitialize();
+    printf("uproc id= %i\n", id);
+    //uprocInitialize();
     attachSharedMemory();
     shm_data->ptab.pcb[id].pid = getpid();
     //printf("\nbefore request\n");
@@ -48,10 +48,10 @@ int main (int argc, char ** argv){
 }
 
 void requestResources() {
-  //printf("\nin request\n");
+  printf("\nuproc in request\n");
   srand(time(0));
   int randNum = 18; //rand() % RESOURCES + 1;
-  //printf("rand = %i\n", randNum);
+  printf("rand = %i\n", randNum);
 
   while (shm_data->r_state.work[id][randNum] == 0) {
     if (randNum == RESOURCES) {
@@ -61,7 +61,7 @@ void requestResources() {
       randNum++;
     }
   }
-  //printf("rand = %i\n", randNum);
+  printf("rand = %i\n", randNum);
   shm_data->ptab.pcb[id].resReqIndex = randNum;
   if(shm_data->r_state.work[id][randNum] > 0){
     shm_data->ptab.pcb[id].request[0] = shm_data->r_state.work[id][randNum];
@@ -79,7 +79,7 @@ void requestResources() {
   // printf("\nend of request\n");
   // printf("id = %i\n", id);
   shm_data->requestFlag = id;
-  //printf("in user_proc: requestflag = %i\n", shm_data->requestFlag);
+  printf("in user_proc: requestflag = %i\n", shm_data->requestFlag);
 
 }
 
@@ -88,12 +88,12 @@ void releaseResources() {
 }
 
 void uprocInitialize(){
-  semaphore = sem_open(SEM_NAME, O_RDWR);
-
-  if (semaphore == SEM_FAILED) {
-    perror("sem_open(3) failed\n");
-    exit(EXIT_FAILURE);
-  }
+  // semaphore = sem_open(SEM_NAME, O_RDWR);
+  //
+  // if (semaphore == SEM_FAILED) {
+  //   perror("sem_open(3) failed\n");
+  //   exit(EXIT_FAILURE);
+  // }
 
   // if (sem_wait(semaphore) < 0) {
   //   perror("sem_wait(3) failed on child\n");
@@ -115,6 +115,7 @@ void uprocInitialize(){
 }
 
 void attachSharedMemory() {
+  printf("uproc attachSharedMemory\n");
   shm_data = shmAttach();
 }
 

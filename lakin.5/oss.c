@@ -55,12 +55,12 @@ int main(int argc, char ** argv){
       sleep(1);
     }
     sleep(1);
-    // printClaimMatrix();
-    // sleep(1);
-    //printf("end of oss main\n");
-    // printAllocMatrix();
-    // sleep(1);
-    // printWorkMatrix();
+    printClaimMatrix();
+    sleep(1);
+    printf("end of oss main\n");
+    printAllocMatrix();
+    sleep(1);
+    printWorkMatrix();
     printStats();
 
     printf("oss done\n");
