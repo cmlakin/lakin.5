@@ -29,16 +29,19 @@ void checkRequest(int id) {
     else if (shm_data->ptab.pcb[pInd].request[0] > shm_data->r_state.available[rInd]) {
       //< suspend process >;
       // put process in wait queue_priority
-      if (termChance > PROB_TERMINATE) {
+      //if (termChance > PROB_TERMINATE) {
         enqueue(rInd, pInd);
         printf("put process in wait queue\n");
+        printf("enqueue = %i %i\n", rInd, pInd);
+        queueDump(rInd);
+
         shm_data->grantWait++;
-      }
-      else {
-        printf("proc terminated???\n");
-        shm_data->procChoseT++;
-        procTerminate(pInd);
-      }
+      // }
+      // else {
+      //   printf("proc terminated???\n");
+      //   shm_data->procChoseT++;
+      //   procTerminate(pInd);
+      // }
 
     }
     else { // simulate allocation
@@ -78,15 +81,16 @@ void checkRequest(int id) {
         shm_data->r_state.available[rInd] = shm_data->r_state.available[rInd] + shm_data->ptab.pcb[pInd].request[0];
         //< suspend process i>;
               // put process in wait queue_priority
-        if (termChance > PROB_TERMINATE) {
+        //if (termChance > PROB_TERMINATE) {
           enqueue(rInd, pInd);
+          queueDump(rInd);
           printf("put process in wait queue\n");
           shm_data->grantWait++;
-        }
-        else {
-        shm_data->procTbyDlck++;
-          procTerminate(pInd);
-        }
+        // }
+        // else {
+        // shm_data->procTbyDlck++;
+        //   procTerminate(pInd);
+        // }
       }
     }
   }

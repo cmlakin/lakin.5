@@ -25,3 +25,4 @@ extern Queue all_queues[RESOURCES];
 
 void enqueue(int, int);
 int dequeue(int);
+void queueDump(int);

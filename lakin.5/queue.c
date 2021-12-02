@@ -55,17 +55,18 @@ int queueShift(Queue * queue) {
     return item->processId;
 }
 
-// void queueDump(int index, char * indent) {
-//     priorityQueue * q = getQueue(index);
-//
-//     priorityItem *h = q->head;
-//
-//
-//     while(h != NULL) {
-//         h = h->next;
-//     }
-//
-// }
+void queueDump(int index) {
+    Queue * q = &all_queues[index];
+
+    queueItem *h = q->head;
+
+
+    while(h != NULL) {
+      printf("%d\n", h->processId);
+        h = h->next;
+    }
+
+}
 
 // void enqueueHigh(PCB * pcb) {
 //     queuePush(QT_HIGH_PRIORITY, pcb);
