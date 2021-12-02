@@ -21,3 +21,7 @@ typedef struct Queue {
 
 extern Queue all_queues[RESOURCES];
 //void queueDump(int index, char * indent);
+
+
+void enqueue(int, int);
+int dequeue(int);

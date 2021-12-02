@@ -46,7 +46,7 @@ int queueShift(Queue * queue) {
 
     if(item == NULL) {
         queue->tail = NULL;
-        return NULL;
+        return -1;
     }
     queue->head = queue->head->next;
     if(queue->head == NULL) {

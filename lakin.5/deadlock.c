@@ -2,7 +2,9 @@
 #include "config.h"
 #include "logger.h"
 #include "resource.h"
+#include "queue.h"
 #include "deadlock.h"
+
 
 
 void checkRequest(int id) {
@@ -28,6 +30,7 @@ void checkRequest(int id) {
       //< suspend process >;
       // put process in wait queue_priority
       if (termChance > PROB_TERMINATE) {
+        enqueue(rInd, pInd);
         printf("put process in wait queue\n");
         shm_data->grantWait++;
       }
@@ -76,6 +79,7 @@ void checkRequest(int id) {
         //< suspend process i>;
               // put process in wait queue_priority
         if (termChance > PROB_TERMINATE) {
+          enqueue(rInd, pInd);
           printf("put process in wait queue\n");
           shm_data->grantWait++;
         }
