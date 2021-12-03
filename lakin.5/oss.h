@@ -43,7 +43,7 @@ void requestResponse();
 void createMessageQueue();
 void launchNewProc();
 void ossClock();
-void updateClock(int, int);
+// void updateClock(int, int);
 // void logger(const char *);
 void deinitSharedMemory();
 void setBit(int);
@@ -55,6 +55,6 @@ int initializeSig();
 void scheduler();
 int findAvailablePcb(void);
 void initializeSemaphore();
-void releaseResources(int);
+
 void printStats();
 void initStats();

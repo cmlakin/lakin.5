@@ -28,12 +28,13 @@
 #define FTOK_MSG 2
 #define FTOK_BASE "oss.c"
 
-#define SEM_NAME "/try36"
+#define SEM_NAME "/try48"
 #define SEM_PERMS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
 #define INITIAL_VALUE 1
 #define CHILD_PROGRAM "user_proc"
 #define ITERS 10
 
+#define MAX_TOT_PROCS 40
 #define PROCESSES 18
 #define RESOURCES 20
 #define LOG_FILENAME "oss.log"

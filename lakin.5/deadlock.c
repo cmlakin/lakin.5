@@ -14,10 +14,7 @@ void checkRequest(int id) {
   int termChance = rand() % 10 +1;
   int pInd = id;
   int rInd = shm_data->ptab.pcb[pInd].resReqIndex;
-  // printf("in checkRequest\n");
-  // printf("pInd = %i\n", pInd);
-  // printf("rInd = %i\n", rInd);
-  // printf("termChance = %i\n", termChance);
+  int randNano;
 
   if (shm_data->r_state.alloc[pInd][rInd] > 0) {
     // resource allocation algorithm
@@ -27,25 +24,28 @@ void checkRequest(int id) {
       // error message, request can not
     }
     else if (shm_data->ptab.pcb[pInd].request[0] > shm_data->r_state.available[rInd]) {
+      randNano = rand() % 500000000;
+      updateClock(0, randNano);
       //< suspend process >;
       // put process in wait queue_priority
-      //if (termChance > PROB_TERMINATE) {
+      if (termChance > PROB_TERMINATE) {
         enqueue(rInd, pInd);
-        printf("put process in wait queue\n");
-        printf("enqueue = %i %i\n", rInd, pInd);
-        queueDump(rInd);
+        // printf("put process in wait queue\n");
+        // printf("enqueue = %i %i\n", rInd, pInd);
+        // queueDump(rInd);
 
         shm_data->grantWait++;
-      // }
-      // else {
-      //   printf("proc terminated???\n");
-      //   shm_data->procChoseT++;
-      //   procTerminate(pInd);
-      // }
+      }
+      else {
+        //printf("proc terminated???\n");
+        shm_data->procChoseT++;
+        procTerminate(pInd);
+      }
 
     }
     else { // simulate allocation
-
+      randNano = rand() % 500000000;
+      updateClock(0, randNano);
       snprintf(logbuf, sizeof(logbuf),
               "\nMaster running deadlock detection at time %0d:%09d:\n", osclock.seconds(), osclock.nanoseconds());
       logger(logbuf);
@@ -59,21 +59,24 @@ void checkRequest(int id) {
 
       //check for safe state
       if (safe (shm_data->r_state)) {
-
+        randNano = rand() % 500000000;
+        updateClock(0, randNano);
         snprintf(logbuf, sizeof(logbuf), "\tSafe state after granting request\n");
         logger(logbuf);
         //< carry out allocation >;
-        printf("request granted\n");
+        //printf("request granted\n");
         shm_data->grantNow++;
         snprintf(logbuf, sizeof(logbuf), "\tMaster granting P%i request R%i at time %0d:%09d\n",
                   pInd, rInd, osclock.seconds(), osclock.nanoseconds());
         logger(logbuf);
       }
       else {
+        randNano = rand() % 500000000;
+        updateClock(0, randNano);
         snprintf(logbuf, sizeof(logbuf), "\tUnsafe state after granting request; request not granted\n");
         logger(logbuf);
         printDeadlock();
-        printf("request denied\n");
+        //printf("request denied\n");
         //< restore original state >;
         // request of resources not granted
         shm_data->r_state.alloc[pInd][rInd] = shm_data->r_state.alloc[pInd][rInd] - shm_data->ptab.pcb[pInd].request[0];
@@ -81,18 +84,22 @@ void checkRequest(int id) {
         shm_data->r_state.available[rInd] = shm_data->r_state.available[rInd] + shm_data->ptab.pcb[pInd].request[0];
         //< suspend process i>;
               // put process in wait queue_priority
-        //if (termChance > PROB_TERMINATE) {
+        if (termChance > PROB_TERMINATE) {
           enqueue(rInd, pInd);
           queueDump(rInd);
-          printf("put process in wait queue\n");
+          //printf("put process in wait queue\n");
           shm_data->grantWait++;
-        // }
-        // else {
-        // shm_data->procTbyDlck++;
-        //   procTerminate(pInd);
-        // }
+        }
+        else {
+        shm_data->procTbyDlck++;
+          procTerminate(pInd);
+        }
       }
     }
+  }
+  else {
+    randNano = rand() % 250000000;
+    updateClock(0, randNano);
   }
 }
 
@@ -195,4 +202,43 @@ void checkRelease(int id) {
     printf("%02d ",shm_data->r_state.available[i]);
   }
 
+}
+
+void requestResources(int id) {
+  shm_data = shmAttach();
+  //printf("\nuproc in request\n");
+  srand(time(0));
+  int randNum = 18; //rand() % RESOURCES + 1;
+
+  while(shm_data->r_state.work[id][randNum] == 0) {
+    if (randNum == RESOURCES) {
+      randNum = 0;
+    }
+    else {
+      randNum++;
+    }
+  }
+  //printf("\nrand = %i\n", randNum);
+  shm_data->ptab.pcb[id].resReqIndex = randNum;
+  if(shm_data->r_state.work[id][randNum] > 0){
+    shm_data->ptab.pcb[id].request[0] = shm_data->r_state.work[id][randNum];
+    //printf("%02d ", shm_data->ptab.pcb[id].request[i]);
+  }
+
+  //printf("request R[%i] = %i\n", randNum, shm_data->ptab.pcb[id].request[0]);
+
+
+  shm_data->requestFlag = id;
+  //printf("in user_proc: requestflag = %i\n", shm_data->requestFlag);
+
+}
+
+void releaseResources(int id) {
+  shm_data = shmAttach();
+  int i;
+  for (i = 0; i < RESOURCES; i++) {
+    shm_data->r_state.available[i] += shm_data->r_state.alloc[id][i];
+    shm_data->r_state.work[id][i] += shm_data->r_state.alloc[id][i];
+    shm_data->r_state.alloc[id][i] = 0;
+  }
 }

@@ -29,6 +29,7 @@ state * initializeResources() {
 }
 // add process resources to claim matix
 state * claimMatrix(PCB *pcb, int pcbIndex) {
+  shm_data = shmAttach();
     int j;
     //printf("\nclaim:");
 
@@ -43,6 +44,7 @@ state * claimMatrix(PCB *pcb, int pcbIndex) {
 
 // initialize allocated values when process is added to claim matrix
 state * allocMatrix(int pcbIndex) {
+  shm_data = shmAttach();
   int j, rMax;
   int id = pcbIndex;
   //printf("\nin alloc before for loop id = %i\n", id);
@@ -88,6 +90,7 @@ state * allocMatrix(int pcbIndex) {
 
 // initialize work matrix (claim - alloc)
 state * workMatrix(){
+  shm_data = shmAttach();
   int i, j;
   //printf("\nin work\n");
 
@@ -111,6 +114,7 @@ state * workMatrix(){
 
 // print claim matrix
 void printClaimMatrix() {
+  shm_data = shmAttach();
     int i, j;
     //printf("claim activeProcs = %i\n", shm_data->activeProcs);
     printf("\nClaim Matrix:\n");
@@ -134,6 +138,7 @@ void printClaimMatrix() {
 
 // print alloc matrix
 void printAllocMatrix() {
+  shm_data = shmAttach();
     int i, j;
     printf("\nAlloc Matrix:\n");
     printf("    ");
@@ -155,6 +160,7 @@ void printAllocMatrix() {
 
 // print work matrix
 void printWorkMatrix() {
+  shm_data = shmAttach();
     int i, j;
     printf("\nWork Matrix:\n");
     printf("    ");
