@@ -61,7 +61,7 @@ typedef struct shared_data {
 	int procsDlck[18];
 
 } shared_data;
-
+shared_data * shm_data;
 int shmGet();
 shared_data * shmAttach();
 void shmDetach();

@@ -28,11 +28,11 @@
 #define FTOK_MSG 2
 #define FTOK_BASE "oss.c"
 
-#define SEM_NAME "/try48"
-#define SEM_PERMS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
-#define INITIAL_VALUE 1
-#define CHILD_PROGRAM "user_proc"
-#define ITERS 10
+// #define SEM_NAME "/try48"
+// #define SEM_PERMS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
+// #define INITIAL_VALUE 1
+// #define CHILD_PROGRAM "user_proc"
+// #define ITERS 10
 
 #define MAX_TOT_PROCS 40
 #define PROCESSES 18
@@ -53,7 +53,7 @@ enum queue_priority {
 };
 
 static int totalProcesses = 0;
-static struct shared_data * shm_data = NULL;
+//static struct shared_data * shm_data = NULL;
 static int MAX = 10; // maximum number of resources
 //static int request[20];
 static int testNum = 2;

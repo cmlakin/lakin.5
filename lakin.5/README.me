@@ -1,0 +1,68 @@
+Corrina Lakin CMP-SCI 4760 Project 5
+
+Resource Management
+
+github: https://github.com/cmlakin/lakin.5.git
+
+how to run:
+make
+./oss
+
+-it gets hung up after creating proc 11. When I reduced the number to 10, it
+got hung up on 9. I will come see you during office hours to talk about this.
+You will have to CTRL C to stop it.
+
+What went well: -again I learned a lot about what not to do. I am so much more
+comfortable with shared memory and a few other parts.
+
+Struggles: Debugging. This takes me A LOT of time and I feel like I'm not very
+good at it. Time management is still a struggle. There is just not enough time
+in my day. Thanksgiving added an additional struggle for me, all of my family
+(out of towners) and extended family came to my house this year, and it was hard
+to juggle still working on this and making time for them. As the semester goes on
+there are just too many balls in the air for me to juggle. I should have went
+to school when I was younger.
+
+What I did not get to:
+- semaphores (I used a lock, but I'm sure that could cause some kind of problem.
+  I do have the flag set up to be set to the processes id so it waits until the
+  flag value equals it's id)
+and I'm sure some other stuff as well.
+
+This is the code I used to determine safe state:
+
+bool safe (state S) {
+    int currentavail[20];
+  int rest[18];
+  int i, k, r;
+  int procCount = shm_data->activeProcs;
+  for (i = 0; i < RESOURCES; i++) {
+    currentavail[i] = shm_data->r_state.available[i];
+  }
+
+  for (i = 0; i < shm_data->activeProcs; i++) {
+    rest[i] = shm_data->ptab.pcb[i].local_pid; // ??? not sure if this is right
+  }
+
+  int possible = 1;
+  while (possible) {
+    for (k = 0; k < shm_data->activeProcs; k++) {
+      possible = 1;
+      for (r = 0; r < RESOURCES; r++) {
+        int canGet = shm_data->r_state.claim[k][r] - shm_data->r_state.alloc[k][r] <= currentavail[r];
+        if (canGet) {        // simulate execution of Pk
+           currentavail[r] = currentavail[r] + shm_data->r_state.alloc[k][r];
+           shm_data->procsDlck[r] = 0;
+         } else {
+           possible = 0;
+           shm_data->procsDlck[r] = 1;
+         }
+
+      }
+      if (possible == 1) {
+        procCount--;
+      }
+    }
+    return (procCount == 0);
+  }
+}

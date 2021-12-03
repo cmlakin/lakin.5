@@ -8,7 +8,7 @@
 
 
 void checkRequest(int id) {
-  shm_data = shmAttach();
+
   srand(time(0));
   //int i;
   int termChance = rand() % 10 +1;
@@ -186,7 +186,7 @@ void procTerminate(int id){
 }
 
 void checkRelease(int id) {
-  shm_data = shmAttach();
+  
   int i;
   printf("current available:\n");
   for (i = 0; i < RESOURCES; i++) {
@@ -205,7 +205,7 @@ void checkRelease(int id) {
 }
 
 void requestResources(int id) {
-  shm_data = shmAttach();
+
   //printf("\nuproc in request\n");
   srand(time(0));
   int randNum = 18; //rand() % RESOURCES + 1;
@@ -234,7 +234,7 @@ void requestResources(int id) {
 }
 
 void releaseResources(int id) {
-  shm_data = shmAttach();
+
   int i;
   for (i = 0; i < RESOURCES; i++) {
     shm_data->r_state.available[i] += shm_data->r_state.alloc[id][i];
