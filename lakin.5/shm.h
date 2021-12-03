@@ -12,14 +12,6 @@ typedef struct state {
 	int work[18][20];
 } state;
 
-// typedef struct rsrc_queue {
-// 	int processes[10]; // will hold spots for 10 processes, if all spots filled requesting process will terminate
-// } RQ;
-//
-// typedef struct queue_table {
-// 	struct rsrc_queue queues[20]; // queue for each resource
-// } queue_table;
-
 typedef struct proc_ctrl_blck {
 	int pid;
 	int local_pid;

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
+#include "oss.h"
 #include "user_proc.h"
 #include "config.h"
 #include "shm.h"
@@ -34,16 +34,12 @@ int main (int argc, char ** argv){
     printf("In user_proc %s\n", argv[1]);
 
     id = atoi(argv[1]);
-    //pcb = &shm_data->ptab.pcb[id];
-    //printf("pcb local pid: %i\n", pcb->local_pid);
-    printf("uproc id= %i\n", id);
     //uprocInitialize();
     attachSharedMemory();
     shm_data->ptab.pcb[id].pid = getpid();
-    //printf("\nbefore request\n");
-    requestResources();
-    //printf("\nafter request\n");
 
+    requestResources();
+    loop(id);
     //return 0;
 }
 
@@ -83,7 +79,36 @@ void requestResources() {
 
 }
 
-void releaseResources() {
+void loop(int id){
+  struct timespec start;
+  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+  //srand(time(0));
+  //int randNum = rand() % 250000000000 + 1;
+  printf("in loop()\n");
+  while(true) {
+      struct timespec now;
+      long diff;
+
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &now);
+    diff = start.tv_nsec - now.tv_nsec;
+
+    if (diff > 1000000000) {
+      break;
+    }
+  }
+
+  srand(time(0));
+  int randNum = rand() % 10 + 1;
+
+  if (randNum < PROB_RELEASE) {
+    releaseResources(id);
+  }
+  else if (randNum < PROB_TERMINATE) {
+    procTerminate(id);
+  }
+  else {
+    requestResources();
+  }
 
 }
 

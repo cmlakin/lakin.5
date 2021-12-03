@@ -17,7 +17,7 @@ oss.o: oss.c oss.h config.h osclock.h
 user_proc: user_proc.o deadlock.o shm.o logger.o osclock.o queue.o
 	$(GCC)  $(CFLAGS) user_proc.o deadlock.o shm.o logger.o osclock.o queue.o -o user_proc
 
-user_proc.o: user_proc.c
+user_proc.o: user_proc.c oss.h
 	$(GCC) $(CFLAGS) -c user_proc.c
 
 osclock.o: osclock.c osclock.h shm.h

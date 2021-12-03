@@ -38,18 +38,8 @@
 #define RESOURCES 20
 #define LOG_FILENAME "oss.log"
 
-
-#define PT_IO_BOUND  0x0001
-#define PT_CPU_BOUND 0x0002
-#define PT_BLOCK     0x0004
-#define PT_USE_TIME  0x0008
-#define PT_TERMINATE 0x0010
-
 #define PROB_TERMINATE 3		// 30% of the time terminate if request not granted
-#define PROB_CPU		100		// 70% of the time CPU bound
-#define PROB_CB_IU	40		// CPU block or IO use all 35%
-#define PROB_IB_CA	100		// IO block or CPU use all 60%
-
+#define PROB_RELEASE	 2		// 20% of the time CPU bound
 
 #define NEW_PROC_MAX_SECS 2
 #define NEW_PROC_MAX_NANO 1000000000

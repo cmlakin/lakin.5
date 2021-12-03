@@ -77,6 +77,14 @@ void scheduler() {
     // printf("pInd = %i\n", pInd);
 
     srand(time(0));
+    int relChance = rand() % 10 + 1;
+
+    if (relChance < PROB_RELEASE){
+      releaseResources(pInd);
+    }
+    else {
+      //requestResources();
+    }
 /*  this code is causing problem after execing into user_proc
     // while (totalProcesses < testNum) {
     //
@@ -215,6 +223,7 @@ void releaseResources(int id) {
 }
 
 void initialize() {
+    ossClock();
     initializeSharedMemory();
     initializeResources();
     initializeSemaphore();
