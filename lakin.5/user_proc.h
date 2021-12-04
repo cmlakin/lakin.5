@@ -12,5 +12,5 @@ sem_t *semaphore;
 
 void uprocInitialize();
 void attachSharedMemory();
-void requestResources();
-void releaseResources();
+
+void loop();

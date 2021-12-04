@@ -21,22 +21,6 @@
 #include "deadlock.h"
 #include "logger.h"
 
-/***
-	- allocate shm for data structures
-		-create 20 resources with descriptors
-			-16 static
-			-4 shared (no deadlock detection necessary)
-			-initialize with value 1-10
-	-18 max processes at one time
-	-run deadlock avoidance algorithm before granting resources
-		-if yes, update all data structures when resources granted or released
-		-if no, put in waiting queue and go to sleep until awakened
-	-update clock as necessary
-	-fork children at random times (1-500 milliseconds of loggerical clock)
-
-***/
-//
-
 int main(int argc, char ** argv){
 
     unlink(LOG_FILENAME);
@@ -50,17 +34,10 @@ int main(int argc, char ** argv){
         osclock.add(shm_data->launchSec, shm_data->launchNano);
     }
 
-    while (totalProcesses < testNum) {
-      scheduler();
-      sleep(1);
-    }
+    scheduler();
+
     sleep(1);
-    // printClaimMatrix();
-    // sleep(1);
-    //printf("end of oss main\n");
-    // printAllocMatrix();
-    // sleep(1);
-    // printWorkMatrix();
+
     printStats();
 
     printf("oss done\n");
@@ -73,56 +50,34 @@ void scheduler() {
     PCB * foo;
 
     foo = createProcess();
-    int pInd = foo->local_pid & 0xff;
-    printf("pInd = %i\n", pInd);
+    //int pInd = foo->local_pid & 0xff;
+    // printf("pInd = %i\n", pInd);
 
-    srand(time(0));
-/*  this code is causing problem after execing into user_proc
-    // while (totalProcesses < testNum) {
-    //
-    //
-    //   if (activeProcs < testNum) {
-    //     int create = osclock.seconds() > shm_data->launchSec;
-    //
-    //     if(!create && osclock.seconds()) {
-    //       create = osclock.seconds() > shm_data->launchSec && osclock.nanoseconds() >= shm_data->launchNano;
-    //     }
-    //     if(create) {
-    //       printf("current %0d:%09d\n", osclock.seconds(), osclock.nanoseconds());
-    //       printf("lanuch  %0d:%09d\n", shm_data->launchSec, shm_data->launchNano);
-    //       foo = createProcess();
-    //       launchNewProc();
-    //     }
-    //   }
-*/
+    while (totalProcesses < MAX_TOT_PROCS) {
 
-/* tried to implement timer for checking if process should terminate
-      srand(getpid());
-      int randTermNum = 2;//rand() % 10 + 1;
-      int chkTerminate = rand() % 5;
-      startTime = time(NULL);
-      printf("before while\n");
-      while (time(NULL) - startTime < chkTerminate) {
-        printf("in while\n");
-        if (randTermNum <= PROB_TERMINATE){
-          printf("will terminate\n");
-          procTerminate(pInd);
-          startTime = time(NULL);
+
+      if (shm_data->activeProcs < PROCESSES) {
+        int create = osclock.seconds() > shm_data->launchSec;
+
+        if(!create && osclock.seconds()) {
+          create = osclock.seconds() > shm_data->launchSec && osclock.nanoseconds() >= shm_data->launchNano;
         }
-        exit(0);
+        create = 1;
+        if(create) {
+          printf("current %0d:%09d\n", osclock.seconds(), osclock.nanoseconds());
+          printf("lanuch  %0d:%09d\n", shm_data->launchSec, shm_data->launchNano);
+          foo = createProcess();
+          launchNewProc();
+        }
       }
-*/
+    }
 
-
-      printf("back in scheduler\n");
-
-      releaseResources(pInd);
-    //}
 }
 
 PCB * createProcess() {
     printf("\ncreateProcess\n");
-    // activeProcs++;
+    shm_data->activeProcs++;
+    printf("activeProcs = %i\n", shm_data->activeProcs);
     totalProcesses++;
 
     PCB *pcb;
@@ -168,6 +123,8 @@ PCB * createProcess() {
           exit(EXIT_FAILURE);
         }
     }
+    int randNano = rand() % 500000000;
+  	updateClock(0, randNano);
     //printf("in oss: requestflag = %i\n", shm_data->requestFlag);
     while(shm_data->requestFlag != pcbIndex) {}
     //printf( "out of while loop\n");
@@ -178,29 +135,18 @@ PCB * createProcess() {
               osclock.seconds(), osclock.nanoseconds());
 
     logger(logbuf);
-
     checkRequest(pcbIndex);
-    workMatrix();
-
     osclock.add(0,1);
     return pcb;
 }
 
-void releaseResources(int id) {
-
-  int i;
-  for (i = 0; i < RESOURCES; i++) {
-    shm_data->r_state.available[i] += shm_data->r_state.alloc[id][i];
-    shm_data->r_state.work[id][i] += shm_data->r_state.alloc[id][i];
-    shm_data->r_state.alloc[id][i] = 0;
-  }
-}
-
 void initialize() {
+    ossClock();
     initializeSharedMemory();
     initializeResources();
-    initializeSemaphore();
+    //initializeSemaphore();
     initStats();
+    shm_data->activeProcs = 0;
 }
 
 void initStats() {
@@ -226,20 +172,20 @@ void initializeSharedMemory() {
     shm_data->local_pid = 1;
 }
 
-void initializeSemaphore() {
-  semaphore = sem_open(SEM_NAME, O_CREAT | O_EXCL, SEM_PERMS, INITIAL_VALUE);
-
-  if (semaphore == SEM_FAILED) {
-    perror("sem_open(3) error\n");
-    exit(EXIT_FAILURE);
-  }
-
-  // if (sem_close(semaphore) < 0) {
-  //   perror("sem_close(3) failed\n");
-  //   sem_unlink(SEM_NAME);
-  //   exit(EXIT_FAILURE);
-  // }
-}
+// void initializeSemaphore() {
+//   semaphore = sem_open(SEM_NAME, O_CREAT | O_EXCL, SEM_PERMS, INITIAL_VALUE);
+//
+//   if (semaphore == SEM_FAILED) {
+//     perror("sem_open(3) error\n");
+//     exit(EXIT_FAILURE);
+//   }
+//
+//   // if (sem_close(semaphore) < 0) {
+//   //   perror("sem_close(3) failed\n");
+//   //   sem_unlink(SEM_NAME);
+//   //   exit(EXIT_FAILURE);
+//   // }
+// }
 
 int findAvailablePcb(void) {
     int i;
@@ -277,15 +223,15 @@ void ossClock() {
     printf("ossClock: clockInit %i:%i\n", osclock.seconds(), osclock.nanoseconds());
 }
 
-void updateClock(int sec, int nano) {
-
-    if (nano >= 1000000000) {
-        osclock.add(sec + nano / 1000000000, nano % 1000000000);
-    } else {
-        osclock.add(sec, nano);
-    }
-    //printf("updateClock: %i:%i\n", osclock.seconds(), osclock.nanoseconds());
-}
+// void updateClock(int sec, int nano) {
+//
+//     if (nano >= 1000000000) {
+//         osclock.add(sec + nano / 1000000000, nano % 1000000000);
+//     } else {
+//         osclock.add(sec, nano);
+//     }
+//     //printf("updateClock: %i:%i\n", osclock.seconds(), osclock.nanoseconds());
+// }
 
 void deinitSharedMemory() {
     if (shmdt(shm_data) == -1) {

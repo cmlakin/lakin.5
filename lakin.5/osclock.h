@@ -16,3 +16,5 @@ typedef struct osclock_t {
 } osclock_t;
 
 extern osclock_t osclock;
+
+void updateClock(int, int);

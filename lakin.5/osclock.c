@@ -89,3 +89,13 @@ osclock_t osclock = {
     .seconds = initSeconds,
     .nanoseconds = initNanoseconds
 };
+
+void updateClock(int sec, int nano) {
+
+    if (nano >= 1000000000) {
+        osclock.add(sec + nano / 1000000000, nano % 1000000000);
+    } else {
+        osclock.add(sec, nano);
+    }
+    //printf("updateClock: %i:%i\n", osclock.seconds(), osclock.nanoseconds());
+}

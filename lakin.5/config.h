@@ -28,28 +28,19 @@
 #define FTOK_MSG 2
 #define FTOK_BASE "oss.c"
 
-#define SEM_NAME "/try27"
-#define SEM_PERMS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
-#define INITIAL_VALUE 1
-#define CHILD_PROGRAM "user_proc"
-#define ITERS 10
+// #define SEM_NAME "/try48"
+// #define SEM_PERMS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
+// #define INITIAL_VALUE 1
+// #define CHILD_PROGRAM "user_proc"
+// #define ITERS 10
 
+#define MAX_TOT_PROCS 40
 #define PROCESSES 18
 #define RESOURCES 20
 #define LOG_FILENAME "oss.log"
 
-
-#define PT_IO_BOUND  0x0001
-#define PT_CPU_BOUND 0x0002
-#define PT_BLOCK     0x0004
-#define PT_USE_TIME  0x0008
-#define PT_TERMINATE 0x0010
-
 #define PROB_TERMINATE 3		// 30% of the time terminate if request not granted
-#define PROB_CPU		100		// 70% of the time CPU bound
-#define PROB_CB_IU	40		// CPU block or IO use all 35%
-#define PROB_IB_CA	100		// IO block or CPU use all 60%
-
+#define PROB_RELEASE	 2		// 20% of the time CPU bound
 
 #define NEW_PROC_MAX_SECS 2
 #define NEW_PROC_MAX_NANO 1000000000
@@ -62,10 +53,14 @@ enum queue_priority {
 };
 
 static int totalProcesses = 0;
-static struct shared_data * shm_data = NULL;
+//static struct shared_data * shm_data = NULL;
 static int MAX = 10; // maximum number of resources
 //static int request[20];
-static int testNum = 1;
+static int testNum = 2;
+
+//static int totProcsCreated = 0;
+static int allocatedProcs = 0;
+
 
 // #define MSG_SEND_UPROC 1
 // #define MSG_RECV_UPROC MSG_SEND_UPROC

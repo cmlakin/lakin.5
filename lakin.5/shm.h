@@ -30,11 +30,15 @@ typedef struct shared_data {
 
 	int launchSec;
 	int launchNano;
+	int activeProcs;
 	// simulated clock
   osclock_t osclock;
 
 	// process table
 	struct proc_table ptab;
+
+	// resource queue proc_table
+	//struct queue_table qtab;
 
 	// resource state
 	struct state r_state;
@@ -57,7 +61,7 @@ typedef struct shared_data {
 	int procsDlck[18];
 
 } shared_data;
-
+shared_data * shm_data;
 int shmGet();
 shared_data * shmAttach();
 void shmDetach();

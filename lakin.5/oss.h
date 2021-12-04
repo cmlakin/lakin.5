@@ -26,9 +26,7 @@ char perror_buf[50]; // buffer for perror
 
 static int shm_id = -1; // shared memory identifier
 
-//static int totProcsCreated = 0;
-static int allocatedProcs = 0;
-static int activeProcs = 0;
+
 //static int msg_id = -1;
 //int g_bitVector = 0;
 // char logbuf[200];
@@ -45,7 +43,7 @@ void requestResponse();
 void createMessageQueue();
 void launchNewProc();
 void ossClock();
-void updateClock(int, int);
+// void updateClock(int, int);
 // void logger(const char *);
 void deinitSharedMemory();
 void setBit(int);
@@ -57,6 +55,6 @@ int initializeSig();
 void scheduler();
 int findAvailablePcb(void);
 void initializeSemaphore();
-void releaseResources(int);
+
 void printStats();
 void initStats();
